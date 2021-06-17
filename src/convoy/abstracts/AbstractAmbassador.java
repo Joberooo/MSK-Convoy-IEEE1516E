@@ -16,10 +16,16 @@ public abstract class AbstractAmbassador extends NullFederateAmbassador {
     public boolean isAnnounced        = false;
     public boolean isReadyToRun       = false;
 
+    public boolean isRunning          = true;
+
     protected AbstractAmbassador(AbstractFederate federate, double federateTime, double federateLookahead) {
         this.federate = federate;
         this.federateTime = federateTime;
         this.federateLookahead = federateLookahead;
+    }
+
+    public void stopRunning(){
+        this.isRunning = false;
     }
 
     @Override

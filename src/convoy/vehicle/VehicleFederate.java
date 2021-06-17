@@ -22,6 +22,7 @@ public class VehicleFederate extends AbstractFederate {
     protected ArrayList<ObjectInstanceHandle> vehicleList = new ArrayList<>();
     protected ArrayList<Float> positionList = new ArrayList<>();
     protected ArrayList<Integer> actualRouteNumberList = new ArrayList<>();
+    protected float endOfRouts = (float) 100.0;
 
     protected VehicleFederate() {
         super(FEDERATE_NAME, FEDERATION_NAME, TIME_STEP);
@@ -60,14 +61,17 @@ public class VehicleFederate extends AbstractFederate {
         actualRouteNumberList.add(0);
         vehicleList.add(objectHandle2);
 
-        for( int i = 0; i < ITERATIONS; i++ )
+        while(federationAmbassador.isRunning)
         {
             for(int j = 0; j < vehicleList.size(); j++){
                 modifyCarParameters(j);
                 updateAttributeValues( vehicleList.get(j), j );
             }
 
-            sendInteraction();
+            if(positionList.get(0) > endOfRouts){
+                sendInteraction();
+                federationAmbassador.stopRunning();
+            }
 
             advanceTime();
             log( "Time Advanced to " + federationAmbassador.federateTime );
@@ -82,11 +86,11 @@ public class VehicleFederate extends AbstractFederate {
     protected void modifyCarParameters(int id){
         float position = positionList.get(id) + new Random().nextFloat();
         positionList.set(id, position);
-        System.out.println(FEDERATE_NAME + ": Position = " + position);
+        System.out.println(FEDERATE_NAME + "    : Position[" + id + "] = " + position);
 
         int actualRouteNumber = (int) position / 100;
         actualRouteNumberList.set(id, actualRouteNumber);
-        System.out.println(FEDERATE_NAME + ": Route = " + actualRouteNumber);
+        System.out.println(FEDERATE_NAME + "    : Route[" + id + "] = " + actualRouteNumber);
     }
 
     @Override
