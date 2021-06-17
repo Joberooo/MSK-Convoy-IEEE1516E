@@ -5,7 +5,6 @@ public class Vehicle {
     private int routeSectionNumber;
     private float vehiclePosition;
     private float carVelocity;
-    private float carAcceleration;
     private float fuelLevel;
 
     public Vehicle(int vehicleNumber, int routeSectionNumber, float fuelLevel,
@@ -20,14 +19,14 @@ public class Vehicle {
 
     public void drive(float previousVehiclePosition, float expectedDistance){
         float distance = previousVehiclePosition - this.vehiclePosition;
-        this.carAcceleration = (float) (distance - (distance/expectedDistance) - expectedDistance*1.01);
-        this.fuelLevel = (float) (this.fuelLevel - Math.abs(this.carAcceleration)*0.01);
-        this.vehiclePosition = this.vehiclePosition + this.carAcceleration;
+        this.carVelocity = (distance - (distance/expectedDistance) - expectedDistance*1.01f);
+        this.fuelLevel = (this.fuelLevel - Math.abs(this.carVelocity)*0.01f);
+        this.vehiclePosition = this.vehiclePosition + this.carVelocity;
     }
     public void drive(float convoyVelocity){
-        this.carAcceleration = 0;
-        this.carVelocity = convoyVelocity + this.carAcceleration;
-        this.fuelLevel = (float) (this.fuelLevel - this.carVelocity*0.01 - Math.abs(this.carAcceleration)*0.01);
+        this.carVelocity = 0;
+        this.carVelocity = convoyVelocity + this.carVelocity;
+        this.fuelLevel = (this.fuelLevel - this.carVelocity*0.01f - Math.abs(this.carVelocity)*0.01f);
         this.vehiclePosition = this.vehiclePosition + this.carVelocity;
     }
 
@@ -45,10 +44,6 @@ public class Vehicle {
 
     public float getCarVelocity() {
         return carVelocity;
-    }
-
-    public float getCarAcceleration() {
-        return carAcceleration;
     }
 
     public float getFuelLevel() {
