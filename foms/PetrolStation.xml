@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<objectModel
+        xmlns="http://standards.ieee.org/IEEE1516-2010"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://standards.ieee.org/IEEE1516-2010 http://standards.ieee.org/downloads/1516/1516.2-2010/IEEE1516-DIF-2010.xsd">
+    <modelIdentification>
+        <name>Vehicle</name>
+        <type>FOM</type>
+        <version>1.0</version>
+    </modelIdentification>
+    <objects>
+        <objectClass>
+            <name>HLAobjectRoot</name>
+            <objectClass>
+                <name>PetrolStation</name>
+                <sharing>PublishSubscribe</sharing>
+                <semantics>One of PetrolStations</semantics>
+                <attribute>
+                    <name>PetrolStationNumber</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <updateType>Conditional</updateType>
+                    <updateCondition>On Change</updateCondition>
+                    <ownership>Divest</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>TimeStamp</order>
+                    <semantics>ID of single petrolStation</semantics>
+                </attribute>
+                <attribute>
+                    <name>PetrolStationPosition</name>
+                    <dataType>HLAfloat32BE</dataType>
+                    <updateType>Conditional</updateType>
+                    <updateCondition>On Change</updateCondition>
+                    <ownership>Divest</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>TimeStamp</order>
+                    <semantics>Position of single petrolStation</semantics>
+                </attribute>
+                <attribute>
+                    <name>RouteNumber</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <updateType>Conditional</updateType>
+                    <updateCondition>On Change</updateCondition>
+                    <ownership>Divest</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>TimeStamp</order>
+                    <semantics>RouteNumber where actually is PetrolStation</semantics>
+                </attribute>
+            </objectClass>
+        </objectClass>
+    </objects>
+    <interactions>
+        <interactionClass>
+            <name>HLAinteractionRoot</name>
+            <interactionClass>
+                <name>EndOfFueling</name>
+                <sharing>PublishSubscribe</sharing>
+                <transportation>HLAreliable</transportation>
+                <order>Receive</order>
+                <semantics>Finish fueling</semantics>
+            </interactionClass>
+        </interactionClass>
+    </interactions>
+</objectModel>

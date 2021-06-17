@@ -23,28 +23,34 @@ public class Vehicle {
 
     public void drive(float previousVehiclePosition, float expectedDistance, int typeOfWeather, int typeOfRoute,
                       float windDirectionX, float windDirectionY, float windForce, boolean isSectionDelayed) {
-        float distance = previousVehiclePosition - this.vehiclePosition;
-        this.carVelocity = (distance - (distance / expectedDistance) - expectedDistance * 1.01f);
-        weatherDelay(typeOfWeather);
-        routeDelay(typeOfRoute);
-        windDelay(windDirectionX, windDirectionY, windForce);
-        if (this.carVelocity > this.maxVelocity) this.carVelocity = this.maxVelocity;
-        if (this.fuelLevel < 10.0f) fuelReserve = true;
-        if (isSectionDelayed) sectionDelay();
-        this.fuelLevel = (this.fuelLevel - Math.abs(this.carVelocity) * 0.01f);
+        if(fuelLevel > 0){
+            float distance = previousVehiclePosition - this.vehiclePosition;
+            this.carVelocity = (distance - (distance / expectedDistance) - expectedDistance * 1.1f);
+            weatherDelay(typeOfWeather);
+            routeDelay(typeOfRoute);
+            windDelay(windDirectionX, windDirectionY, windForce);
+            if (this.carVelocity > this.maxVelocity) this.carVelocity = this.maxVelocity;
+            if (this.fuelLevel < 10.0f) fuelReserve = true;
+            if (isSectionDelayed) sectionDelay();
+            this.fuelLevel = (this.fuelLevel - Math.abs(this.carVelocity) * 0.01f);
+        }
+        else this.carVelocity = 0;
         this.vehiclePosition = this.vehiclePosition + this.carVelocity;
     }
 
     public void drive(float convoyVelocity, int typeOfWeather, int typeOfRoute, float windDirectionX,
                       float windDirectionY, float windForce, boolean isSectionDelayed) {
-        this.carVelocity = 0;
-        this.carVelocity = convoyVelocity + this.carVelocity;
-        weatherDelay(typeOfWeather);
-        routeDelay(typeOfRoute);
-        windDelay(windDirectionX, windDirectionY, windForce);
-        if (this.carVelocity > this.maxVelocity) this.carVelocity = this.maxVelocity;
-        if (isSectionDelayed) sectionDelay();
-        this.fuelLevel = (this.fuelLevel - this.carVelocity * 0.01f - Math.abs(this.carVelocity) * 0.01f);
+        if(fuelLevel > 0){
+            this.carVelocity = 0;
+            this.carVelocity = convoyVelocity + this.carVelocity;
+            weatherDelay(typeOfWeather);
+            routeDelay(typeOfRoute);
+            windDelay(windDirectionX, windDirectionY, windForce);
+            if (this.carVelocity > this.maxVelocity) this.carVelocity = this.maxVelocity;
+            if (isSectionDelayed) sectionDelay();
+            this.fuelLevel = (this.fuelLevel - this.carVelocity * 0.01f - Math.abs(this.carVelocity) * 0.01f);
+        }
+        else this.carVelocity = 0;
         this.vehiclePosition = this.vehiclePosition + this.carVelocity;
     }
 

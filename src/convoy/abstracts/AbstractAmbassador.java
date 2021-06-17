@@ -17,6 +17,7 @@ public abstract class AbstractAmbassador extends NullFederateAmbassador {
     public boolean isReadyToRun       = false;
 
     public boolean isRunning          = true;
+    public boolean shouldUpdate       = true;
 
     protected AbstractAmbassador(AbstractFederate federate, double federateTime, double federateLookahead) {
         this.federate = federate;
@@ -26,6 +27,10 @@ public abstract class AbstractAmbassador extends NullFederateAmbassador {
 
     public void stopRunning(){
         this.isRunning = false;
+    }
+
+    public void changeShouldUpdate(){
+        this.shouldUpdate = !this.shouldUpdate;
     }
 
     @Override

@@ -38,7 +38,11 @@ public class VehicleAmbassador extends AbstractAmbassador {
 
         builder.append(", attributeCount=").append(theAttributes.size()).append( "\n" );
 
-        VehicleFederate.SingleRouteSection single = new VehicleFederate.SingleRouteSection();
+        boolean isItRoute = false;
+        VehicleFederate.SingleRouteSection singleRoute = new VehicleFederate.SingleRouteSection();
+
+        boolean isItPetrol = false;
+        VehicleFederate.SinglePetrolStation singlePetrol = new VehicleFederate.SinglePetrolStation();
 
         for( AttributeHandle attributeHandle : theAttributes.keySet() )
         {
@@ -54,7 +58,8 @@ public class VehicleAmbassador extends AbstractAmbassador {
                     e.printStackTrace();
                 }
                 builder.append( number.getValue() );
-                single.routeNumber = number.getValue();
+                isItRoute = true;
+                singleRoute.routeNumber = number.getValue();
             }
             else if( attributeHandle.equals(federate.routeSectionLengthHandle) )
             {
@@ -66,7 +71,8 @@ public class VehicleAmbassador extends AbstractAmbassador {
                     e.printStackTrace();
                 }
                 builder.append( length.getValue() );
-                single.routeLength = length.getValue();
+                isItRoute = true;
+                singleRoute.routeLength = length.getValue();
             }
             else if( attributeHandle.equals(federate.routeSurfaceHandle) )
             {
@@ -78,7 +84,8 @@ public class VehicleAmbassador extends AbstractAmbassador {
                     e.printStackTrace();
                 }
                 builder.append( surface.getValue() );
-                single.routeSurface = surface.getValue();
+                isItRoute = true;
+                singleRoute.routeSurface = surface.getValue();
             }
             else if( attributeHandle.equals(federate.routeSectionIsClosedHandle) )
             {
@@ -90,26 +97,81 @@ public class VehicleAmbassador extends AbstractAmbassador {
                     e.printStackTrace();
                 }
                 builder.append( isClosed.getValue() );
-                single.routeIsClosed = isClosed.getValue();
+                isItRoute = true;
+                singleRoute.routeIsClosed = isClosed.getValue();
+            }
+            else if( attributeHandle.equals(federate.petrolStationNumberHandle) )
+            {
+                builder.append( attributeHandle ).append( " (petrolStationNumber) " ).append( ", attributeValue=" );
+                HLAinteger32BE number = new HLA1516eInteger32BE();
+                try {
+                    number.decode(theAttributes.get(attributeHandle));
+                } catch (DecoderException e) {
+                    e.printStackTrace();
+                }
+                builder.append( number.getValue() );
+                isItPetrol = true;
+                singlePetrol.petrolNumber = number.getValue();
+            }
+            else if( attributeHandle.equals(federate.petrolStationPositionHandle) )
+            {
+                builder.append( attributeHandle ).append( " (petrolStationPosition) " ).append( ", attributeValue=" );
+                HLAfloat32BE position = new HLA1516eFloat32BE();
+                try {
+                    position.decode(theAttributes.get(attributeHandle));
+                } catch (DecoderException e) {
+                    e.printStackTrace();
+                }
+                builder.append( position.getValue() );
+                isItPetrol = true;
+                singlePetrol.petrolPosition = position.getValue();
+            }
+            else if( attributeHandle.equals(federate.petrolStationRouteNumberHandle) )
+            {
+                builder.append( attributeHandle ).append( " (petrolStationRouteNumber) " ).append( ", attributeValue=" );
+                HLAinteger32BE petrolStationRouteNumber = new HLA1516eInteger32BE();
+                try {
+                    petrolStationRouteNumber.decode(theAttributes.get(attributeHandle));
+                } catch (DecoderException e) {
+                    e.printStackTrace();
+                }
+                builder.append( petrolStationRouteNumber.getValue() );
+                isItPetrol = true;
+                singlePetrol.routeNumber = petrolStationRouteNumber.getValue();
             }
             else builder.append( attributeHandle ).append( " (Unknown)   " );
             builder.append( "\n" );
         }
         boolean add = true;
-        for(VehicleFederate.SingleRouteSection s : federate.singleRouteSectionList){
-            if(s.routeNumber == single.routeNumber){
-                s.routeIsClosed = single.routeIsClosed;
-                s.routeLength = single.routeLength;
-                s.routeSurface = single.routeSurface;
-                add = false;
-                break;
+        if(isItRoute){
+            for(VehicleFederate.SingleRouteSection s : federate.singleRouteSectionList){
+                if(s.routeNumber == singleRoute.routeNumber){
+                    s.routeIsClosed = singleRoute.routeIsClosed;
+                    s.routeLength = singleRoute.routeLength;
+                    s.routeSurface = singleRoute.routeSurface;
+                    add = false;
+                    break;
+                }
             }
         }
-        if(add){
-            federate.singleRouteSectionList.add(single);
+        if(isItPetrol){
+            for(VehicleFederate.SinglePetrolStation p : federate.singlePetrolStationsList){
+                if(p.petrolNumber == singlePetrol.petrolNumber){
+                    p.petrolPosition = singlePetrol.petrolPosition;
+                    p.routeNumber = singlePetrol.routeNumber;
+                    add = false;
+                    break;
+                }
+            }
+        }
+        if(add && isItRoute){
+            federate.singleRouteSectionList.add(singleRoute);
             Collections.sort(federate.singleRouteSectionList);
         }
-
+        if(add && isItPetrol){
+            federate.singlePetrolStationsList.add(singlePetrol);
+            Collections.sort(federate.singlePetrolStationsList);
+        }
         log( builder.toString() );
     }
 

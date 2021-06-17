@@ -61,10 +61,12 @@ public class RouteSectionFederate extends AbstractFederate {
 
         while(federationAmbassador.isRunning)
         {
-            for(int j = 0; j < routeSectionObjectInstanceHandleList.size(); j++){
-                updateAttributeValues( routeSectionObjectInstanceHandleList.get(j), j );
+            if(federationAmbassador.shouldUpdate){
+                for(int j = 0; j < routeSectionObjectInstanceHandleList.size(); j++){
+                    updateAttributeValues( routeSectionObjectInstanceHandleList.get(j), j );
+                }
+                federationAmbassador.changeShouldUpdate();
             }
-
 
             advanceTime();
             log( "Time Advanced to " + federationAmbassador.federateTime );

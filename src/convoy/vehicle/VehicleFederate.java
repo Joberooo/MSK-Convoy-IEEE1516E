@@ -53,6 +53,28 @@ public class VehicleFederate extends AbstractFederate {
         }
     }
 
+    protected ObjectClassHandle petrolStationHandle;
+    protected AttributeHandle petrolStationNumberHandle;
+    protected AttributeHandle petrolStationPositionHandle;
+    protected AttributeHandle petrolStationRouteNumberHandle;
+
+    public ArrayList<SinglePetrolStation> singlePetrolStationsList = new ArrayList<>();
+
+    public static class SinglePetrolStation implements Comparable<SinglePetrolStation>{
+        public int petrolNumber;
+        public float petrolPosition;
+        public int routeNumber;
+
+        public Integer getPetrolNumber(){
+            return this.petrolNumber;
+        }
+
+        @Override
+        public int compareTo(@NotNull VehicleFederate.SinglePetrolStation o) {
+            return this.getPetrolNumber().compareTo(o.getPetrolNumber());
+        }
+    }
+
     protected VehicleFederate() {
         super(FEDERATE_NAME, FEDERATION_NAME, TIME_STEP);
     }
@@ -195,6 +217,18 @@ public class VehicleFederate extends AbstractFederate {
         attributes.add( routeSurfaceHandle );
         attributes.add( routeSectionIsClosedHandle );
         rtiAmbassador.subscribeObjectClassAttributes(routeSectionHandle, attributes);
+
+        this.petrolStationHandle = rtiAmbassador.getObjectClassHandle( "HLAobjectRoot.PetrolStation" );
+        this.petrolStationNumberHandle = rtiAmbassador.getAttributeHandle( petrolStationHandle, "PetrolStationNumber" );
+        this.petrolStationPositionHandle = rtiAmbassador.getAttributeHandle( petrolStationHandle, "PetrolStationPosition" );
+        this.petrolStationRouteNumberHandle = rtiAmbassador.getAttributeHandle( petrolStationHandle, "RouteNumber" );
+
+        attributes = rtiAmbassador.getAttributeHandleSetFactory().create();
+        attributes.add( petrolStationNumberHandle );
+        attributes.add( petrolStationPositionHandle );
+        attributes.add(petrolStationRouteNumberHandle);
+
+        rtiAmbassador.subscribeObjectClassAttributes( petrolStationHandle, attributes );
     }
 
     protected void updateAttributeValues(ObjectInstanceHandle objectHandle, int id) throws RTIexception {
