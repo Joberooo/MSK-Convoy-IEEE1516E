@@ -38,7 +38,7 @@
                     <semantics>Length of single route section</semantics>
                 </attribute>
                 <attribute>
-                    <name>RouteSurface</name>
+                    <name>RouteSectionSurface</name>
                     <dataType>HLAinteger32BE</dataType>
                     <updateType>Conditional</updateType>
                     <updateCondition>On Change</updateCondition>
@@ -47,6 +47,17 @@
                     <transportation>HLAreliable</transportation>
                     <order>TimeStamp</order>
                     <semantics>Surface of single route section</semantics>
+                </attribute>
+                <attribute>
+                    <name>RouteSectionIsClosed</name>
+                    <dataType>HLA1516eBoolean</dataType>
+                    <updateType>Conditional</updateType>
+                    <updateCondition>On Change</updateCondition>
+                    <ownership>Divest</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>TimeStamp</order>
+                    <semantics>Information about "close" status of single route section</semantics>
                 </attribute>
             </objectClass>
         </objectClass>

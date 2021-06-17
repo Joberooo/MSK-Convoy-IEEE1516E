@@ -6,6 +6,8 @@ import hla.rti1516e.encoding.HLAfloat32BE;
 import hla.rti1516e.encoding.HLAinteger32BE;
 import hla.rti1516e.exceptions.RTIexception;
 import hla.rti1516e.time.HLAfloat64Time;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 
 public class VehicleFederate extends AbstractFederate {
@@ -17,7 +19,7 @@ public class VehicleFederate extends AbstractFederate {
     public static final float EXPECTED_VEHICLES_DISTANCE = 20F;
     public static final int CONVOY_VELOCITY = 50;
     public static final float START_VEHICLES_FUEL = 100F;
-    public static final float END_OF_ROUTS = 1000.0F;
+    public float END_OF_ROUT;
 
     protected ObjectClassHandle vehicleHandle;
     protected AttributeHandle vehicleNumberHandle;
@@ -26,6 +28,30 @@ public class VehicleFederate extends AbstractFederate {
 
     protected ArrayList<Vehicle> vehiclesList = new ArrayList<>();
     protected ArrayList<ObjectInstanceHandle> vehicleObjectInstanceHandleList = new ArrayList<>();
+
+    public ObjectClassHandle routeSectionHandle;
+    public AttributeHandle routeSectionNumberHandle;
+    public AttributeHandle routeSectionLengthHandle;
+    public AttributeHandle routeSurfaceHandle;
+    public AttributeHandle routeSectionIsClosedHandle;
+
+    public ArrayList<SingleRouteSection> singleRouteSectionList = new ArrayList<>();
+
+    public static class SingleRouteSection implements Comparable<SingleRouteSection>{
+        public int routeNumber;
+        public float routeLength;
+        public int routeSurface;
+        public boolean routeIsClosed;
+
+        public Integer getRouteNumber(){
+            return this.routeNumber;
+        }
+
+        @Override
+        public int compareTo(@NotNull VehicleFederate.SingleRouteSection o) {
+            return this.getRouteNumber().compareTo(o.getRouteNumber());
+        }
+    }
 
     protected VehicleFederate() {
         super(FEDERATE_NAME, FEDERATION_NAME, TIME_STEP);
@@ -64,14 +90,21 @@ public class VehicleFederate extends AbstractFederate {
 
         while(federationAmbassador.isRunning)
         {
-            for(int j = 0; j < vehicleObjectInstanceHandleList.size(); j++){
-                modifyCarParameters(j);
-                updateAttributeValues( vehicleObjectInstanceHandleList.get(j), j );
+            if(singleRouteSectionList.size() == 0){
+                log( "Waiting for routs..." );
             }
+            else{
+                calculateCompleteRout();
 
-            if(vehiclesList.get(0).getVehiclePosition() > END_OF_ROUTS){
-                sendFinishSimulationInteraction();
-                federationAmbassador.stopRunning();
+                for(int j = 0; j < vehicleObjectInstanceHandleList.size(); j++){
+                    modifyCarParameters(j);
+                    updateAttributeValues( vehicleObjectInstanceHandleList.get(j), j );
+                }
+
+                if(vehiclesList.get(0).getVehiclePosition() > END_OF_ROUT){
+                    sendFinishSimulationInteraction();
+                    federationAmbassador.stopRunning();
+                }
             }
 
             advanceTime();
@@ -84,13 +117,43 @@ public class VehicleFederate extends AbstractFederate {
         }
     }
 
+    private void calculateCompleteRout(){
+        float completeRout = 0;
+        for(SingleRouteSection s : singleRouteSectionList){
+            completeRout += s.routeLength;
+            log( "Route nr = " + s.routeNumber + ", Length = " + s.routeLength );
+        }
+        log( "CompleteRout = " + completeRout );
+        END_OF_ROUT = completeRout;
+    }
+
     protected void modifyCarParameters(int id){
-        if( id == 0) vehiclesList.get(id).drive(
-                CONVOY_VELOCITY, 0, 0,
-                0, 0, 0, false);
-        else vehiclesList.get(id).drive(
-                vehiclesList.get(id - 1).getVehiclePosition(), EXPECTED_VEHICLES_DISTANCE, 0,
-                0, 0F, 0F, 0, false);
+        int thisRouteNumber = vehiclesList.get(id).getRouteSectionNumber();
+        for(SingleRouteSection s : singleRouteSectionList){
+            if(s.routeNumber == thisRouteNumber){
+                if( id == 0){
+                    vehiclesList.get(id).drive(
+                            CONVOY_VELOCITY, 0, s.routeSurface,
+                            0, 0, 0, s.routeIsClosed);
+                }
+                else{
+                    vehiclesList.get(id).drive(
+                            vehiclesList.get(id - 1).getVehiclePosition(), EXPECTED_VEHICLES_DISTANCE, 0,
+                            s.routeSurface, 0F, 0F, 0, s.routeIsClosed);
+                }
+            }
+        }
+        
+        for(Vehicle v : vehiclesList){
+            float pos = v.getVehiclePosition();
+            for(SingleRouteSection s : singleRouteSectionList){
+                if( pos <= s.routeLength ){
+                    v.setRouteSectionNumber(s.routeNumber);
+                    break;
+                }
+                pos -= s.routeLength;
+            }
+        }
         printVehicleData(vehiclesList.get(id));
     }
 
@@ -119,18 +182,32 @@ public class VehicleFederate extends AbstractFederate {
 
         finishSimulationHandle = rtiAmbassador.getInteractionClassHandle( "HLAinteractionRoot.FinishSimulation" );
         rtiAmbassador.publishInteractionClass(finishSimulationHandle);
+
+        this.routeSectionHandle = rtiAmbassador.getObjectClassHandle( "HLAobjectRoot.RouteSection" );
+        this.routeSectionNumberHandle = rtiAmbassador.getAttributeHandle( routeSectionHandle, "RouteSectionNumber" );
+        this.routeSectionLengthHandle = rtiAmbassador.getAttributeHandle( routeSectionHandle, "RouteSectionLength" );
+        this.routeSurfaceHandle = rtiAmbassador.getAttributeHandle( routeSectionHandle, "RouteSectionSurface" );
+        this.routeSectionIsClosedHandle = rtiAmbassador.getAttributeHandle( routeSectionHandle, "RouteSectionIsClosed" );
+
+        attributes = rtiAmbassador.getAttributeHandleSetFactory().create();
+        attributes.add( routeSectionNumberHandle );
+        attributes.add( routeSectionLengthHandle );
+        attributes.add( routeSurfaceHandle );
+        attributes.add( routeSectionIsClosedHandle );
+        rtiAmbassador.subscribeObjectClassAttributes(routeSectionHandle, attributes);
     }
 
     protected void updateAttributeValues(ObjectInstanceHandle objectHandle, int id) throws RTIexception {
-        AttributeHandleValueMap attributes = rtiAmbassador.getAttributeHandleValueMapFactory().create(2);
+        AttributeHandleValueMap attributes = rtiAmbassador.getAttributeHandleValueMapFactory().create(3);
+
+        HLAinteger32BE vehicleRouteSection = encoderFactory.createHLAinteger32BE( vehiclesList.get(id).getVehicleNumber() );
+        attributes.put( vehicleNumberHandle, vehicleRouteSection.toByteArray() );
 
         HLAfloat32BE newPosition = encoderFactory.createHLAfloat32BE( vehiclesList.get(id).getVehiclePosition() );
         attributes.put( vehiclePositionHandle, newPosition.toByteArray() );
 
-        HLAinteger32BE availableValue = encoderFactory.createHLAinteger32BE( vehiclesList.get(id).getRouteSectionNumber() );
-        attributes.put( vehicleRouteNumberHandle, availableValue.toByteArray() );
-
-        rtiAmbassador.updateAttributeValues( objectHandle, attributes, generateTag() );
+        HLAinteger32BE newVehicleRouteSection = encoderFactory.createHLAinteger32BE( vehiclesList.get(id).getRouteSectionNumber() );
+        attributes.put( vehicleRouteNumberHandle, newVehicleRouteSection.toByteArray() );
 
         HLAfloat64Time time = timeFactory.makeTime( federationAmbassador.federateTime+ federationAmbassador.federateLookahead );
         rtiAmbassador.updateAttributeValues( objectHandle, attributes, generateTag(), time );

@@ -6,7 +6,7 @@ public class Vehicle {
     private float vehiclePosition;
     private float carVelocity;
     private float fuelLevel;
-    private float maxVelocity;
+    private final float maxVelocity;
     private boolean fuelReserve;
 
     public Vehicle(int vehicleNumber, int routeSectionNumber, float fuelLevel,
@@ -92,6 +92,10 @@ public class Vehicle {
 
     public int getRouteSectionNumber() {
         return routeSectionNumber;
+    }
+
+    public void setRouteSectionNumber(int num){
+        this.routeSectionNumber = num;
     }
 
     public float getVehiclePosition() {

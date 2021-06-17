@@ -5,16 +5,19 @@ import hla.rti1516e.*;
 import hla.rti1516e.time.HLAfloat64Time;
 
 public class RouteSectionAmbassador extends AbstractAmbassador {
+    protected final RouteSectionFederate federate;
+
     public static double federateTime        = 0.0;
     public static double federateLookahead   = 1.0;
 
     protected RouteSectionAmbassador(RouteSectionFederate federate) {
         super(federate, federateTime, federateLookahead);
+        this.federate = federate;
     }
 
     @Override
     protected void log(String message) {
-        System.out.println( federate.FEDERATE_NAME + "Ambassador: " + message );
+        System.out.println( RouteSectionFederate.FEDERATE_NAME + "Ambassador: " + message );
     }
 
     @Override

@@ -2,6 +2,7 @@ package convoy.routeSection;
 
 import convoy.abstracts.AbstractFederate;
 import hla.rti1516e.*;
+import hla.rti1516e.encoding.HLAboolean;
 import hla.rti1516e.encoding.HLAfloat32BE;
 import hla.rti1516e.encoding.HLAinteger32BE;
 import hla.rti1516e.exceptions.RTIexception;
@@ -19,7 +20,8 @@ public class RouteSectionFederate extends AbstractFederate {
     protected ObjectClassHandle routeSectionHandle;
     protected AttributeHandle routeSectionNumberHandle;
     protected AttributeHandle routeSectionLengthHandle;
-    protected AttributeHandle routeSurfaceHandle;
+    protected AttributeHandle routeSectionSurfaceHandle;
+    protected AttributeHandle routeSectionIsClosedHandle;
 
     protected ArrayList<RouteSection> routeSectionsList = new ArrayList<>();
     protected ArrayList<ObjectInstanceHandle> routeSectionObjectInstanceHandleList = new ArrayList<>();
@@ -89,12 +91,14 @@ public class RouteSectionFederate extends AbstractFederate {
         this.routeSectionHandle = rtiAmbassador.getObjectClassHandle( "HLAobjectRoot.RouteSection" );
         this.routeSectionNumberHandle = rtiAmbassador.getAttributeHandle( routeSectionHandle, "RouteSectionNumber" );
         this.routeSectionLengthHandle = rtiAmbassador.getAttributeHandle( routeSectionHandle, "RouteSectionLength" );
-        this.routeSurfaceHandle = rtiAmbassador.getAttributeHandle( routeSectionHandle, "RouteSurface" );
+        this.routeSectionSurfaceHandle = rtiAmbassador.getAttributeHandle( routeSectionHandle, "RouteSectionSurface" );
+        this.routeSectionIsClosedHandle = rtiAmbassador.getAttributeHandle( routeSectionHandle, "RouteSectionIsClosed" );
 
         AttributeHandleSet attributes = rtiAmbassador.getAttributeHandleSetFactory().create();
         attributes.add( routeSectionNumberHandle );
         attributes.add( routeSectionLengthHandle );
-        attributes.add( routeSurfaceHandle );
+        attributes.add( routeSectionSurfaceHandle );
+        attributes.add( routeSectionIsClosedHandle );
 
         rtiAmbassador.publishObjectClassAttributes( routeSectionHandle, attributes );
 
@@ -103,17 +107,21 @@ public class RouteSectionFederate extends AbstractFederate {
     }
 
     protected void updateAttributeValues(ObjectInstanceHandle objectHandle, int id) throws RTIexception {
-        AttributeHandleValueMap attributes = rtiAmbassador.getAttributeHandleValueMapFactory().create(2);
+        AttributeHandleValueMap attributes = rtiAmbassador.getAttributeHandleValueMapFactory().create(4);
+
+        HLAinteger32BE routeNumber = encoderFactory.createHLAinteger32BE( routeSectionsList.get(id).getRouteSectionNumber() );
+        attributes.put( routeSectionNumberHandle, routeNumber.toByteArray() );
 
         HLAfloat32BE routeSectionLength = encoderFactory.createHLAfloat32BE( routeSectionsList.get(id).getRouteSectionLength() );
         attributes.put( routeSectionLengthHandle, routeSectionLength.toByteArray() );
 
         HLAinteger32BE routeSurface = encoderFactory.createHLAinteger32BE( routeSectionsList.get(id).getRouteSurface().ordinal() );
-        attributes.put( routeSurfaceHandle, routeSurface.toByteArray() );
+        attributes.put(routeSectionSurfaceHandle, routeSurface.toByteArray() );
 
-        rtiAmbassador.updateAttributeValues( objectHandle, attributes, generateTag() );
+        HLAboolean routeIsClosed = encoderFactory.createHLAboolean( routeSectionsList.get(id).getIsClosed() );
+        attributes.put(routeSectionIsClosedHandle, routeIsClosed.toByteArray() );
 
-        HLAfloat64Time time = timeFactory.makeTime( federationAmbassador.federateTime+ federationAmbassador.federateLookahead );
+        HLAfloat64Time time = timeFactory.makeTime( federationAmbassador.federateTime + federationAmbassador.federateLookahead );
         rtiAmbassador.updateAttributeValues( objectHandle, attributes, generateTag(), time );
     }
 }
