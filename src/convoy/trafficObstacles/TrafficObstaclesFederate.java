@@ -1,13 +1,12 @@
 package convoy.trafficObstacles;
 
 import convoy.abstracts.AbstractFederate;
-import hla.rti1516e.ObjectInstanceHandle;
 import hla.rti1516e.exceptions.RTIexception;
 
 public class TrafficObstaclesFederate extends AbstractFederate {
     public static String FEDERATION_NAME = "ConvoyFederation";
     public static String FEDERATE_NAME = "TrafficObstaclesFederate";
-    public static double TIME_STEP = 100.0;
+    public static double TIME_STEP = 50.0;
 
     protected TrafficObstaclesFederate() {
         super(FEDERATE_NAME, FEDERATION_NAME, TIME_STEP);

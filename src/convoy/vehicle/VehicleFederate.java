@@ -143,7 +143,7 @@ public class VehicleFederate extends AbstractFederate {
                 }
             }
         }
-        
+
         for(Vehicle v : vehiclesList){
             float pos = v.getVehiclePosition();
             for(SingleRouteSection s : singleRouteSectionList){
