@@ -7,7 +7,6 @@ import hla.rti1516e.encoding.HLAinteger32BE;
 import hla.rti1516e.exceptions.RTIexception;
 import hla.rti1516e.time.HLAfloat64Time;
 import java.util.ArrayList;
-import java.util.Random;
 
 public class VehicleFederate extends AbstractFederate {
     public static String FEDERATION_NAME = "ConvoyFederation";
@@ -15,14 +14,18 @@ public class VehicleFederate extends AbstractFederate {
     public static double TIME_STEP = 1.0;
     public static final int ITERATIONS = 20;
 
+    public static final int NUMBERS_OF_VEHICLES = 3;
+    public static final int EXPECTED_VEHICLES_DISTANCE = 20;
+    public static final int CONVOY_VELOCITY = 50;
+    public static final int START_VEHICLES_FUEL = 100;
+    public static final float END_OF_ROUTS = 1000.0F;
+
     protected ObjectClassHandle vehicleHandle;
     protected AttributeHandle vehicleNumberHandle;
     protected AttributeHandle vehiclePositionHandle;
     protected AttributeHandle vehicleRouteNumberHandle;
-    protected ArrayList<ObjectInstanceHandle> vehicleList = new ArrayList<>();
-    protected ArrayList<Float> positionList = new ArrayList<>();
-    protected ArrayList<Integer> actualRouteNumberList = new ArrayList<>();
-    protected float endOfRouts = (float) 100.0;
+    protected ArrayList<Vehicle> vehiclesList = new ArrayList<>();
+    protected ArrayList<ObjectInstanceHandle> vehicleObjectInstanceHandleList = new ArrayList<>();
 
     protected VehicleFederate() {
         super(FEDERATE_NAME, FEDERATION_NAME, TIME_STEP);
@@ -49,26 +52,23 @@ public class VehicleFederate extends AbstractFederate {
         publishAndSubscribe();
         log( "Published and Subscribed" );
 
-        ObjectInstanceHandle objectHandle = registerObject(vehicleHandle);
-        log( "Registered Object, handle=" + objectHandle );
-        positionList.add((float) 0);
-        actualRouteNumberList.add(0);
-        vehicleList.add(objectHandle);
-
-        ObjectInstanceHandle objectHandle2 = registerObject(vehicleHandle);
-        log( "Registered Object, handle=" + objectHandle2 );
-        positionList.add((float) 0);
-        actualRouteNumberList.add(0);
-        vehicleList.add(objectHandle2);
+        for(int i = 0; i < NUMBERS_OF_VEHICLES; i++){
+            ObjectInstanceHandle objectHandle = registerObject(vehicleHandle);
+            log( "Registered Object, handle=" + objectHandle );
+            int startPosition = (NUMBERS_OF_VEHICLES - i) * EXPECTED_VEHICLES_DISTANCE;
+            vehiclesList.add(
+                    new Vehicle(i, 0, START_VEHICLES_FUEL, 0, startPosition));
+            vehicleObjectInstanceHandleList.add(objectHandle);
+        }
 
         while(federationAmbassador.isRunning)
         {
-            for(int j = 0; j < vehicleList.size(); j++){
+            for(int j = 0; j < vehicleObjectInstanceHandleList.size(); j++){
                 modifyCarParameters(j);
-                updateAttributeValues( vehicleList.get(j), j );
+                updateAttributeValues( vehicleObjectInstanceHandleList.get(j), j );
             }
 
-            if(positionList.get(0) > endOfRouts){
+            if(vehiclesList.get(0).getVehiclePosition() > END_OF_ROUTS){
                 sendInteraction();
                 federationAmbassador.stopRunning();
             }
@@ -77,20 +77,21 @@ public class VehicleFederate extends AbstractFederate {
             log( "Time Advanced to " + federationAmbassador.federateTime );
         }
 
-        for (ObjectInstanceHandle objectInstanceHandle : vehicleList) {
+        for (ObjectInstanceHandle objectInstanceHandle : vehicleObjectInstanceHandleList) {
             deleteObject(objectInstanceHandle);
-            log("Deleted Object, handle=" + objectHandle);
+            log("Deleted Object, handle=" + objectInstanceHandle);
         }
     }
 
     protected void modifyCarParameters(int id){
-        float position = positionList.get(id) + new Random().nextFloat();
-        positionList.set(id, position);
-        System.out.println(FEDERATE_NAME + "    : Position[" + id + "] = " + position);
-
-        int actualRouteNumber = (int) position / 100;
-        actualRouteNumberList.set(id, actualRouteNumber);
-        System.out.println(FEDERATE_NAME + "    : Route[" + id + "] = " + actualRouteNumber);
+        if( id == 0) vehiclesList.get(id).drive(CONVOY_VELOCITY);
+        else vehiclesList.get(id).drive(vehiclesList.get(id - 1).getVehiclePosition(), EXPECTED_VEHICLES_DISTANCE);
+        System.out.println("--------------------------------------------------------------------------------");
+        System.out.println(FEDERATE_NAME + "    ::   Vehicle number = " + vehiclesList.get(id).getVehicleNumber());
+        System.out.println(FEDERATE_NAME + "    ::   Position = " + vehiclesList.get(id).getVehiclePosition());
+        System.out.println(FEDERATE_NAME + "    ::   Route = " + vehiclesList.get(id).getRouteSectionNumber());
+        System.out.println(FEDERATE_NAME + "    ::   FuelLevel = " + vehiclesList.get(id).getFuelLevel());
+        System.out.println("--------------------------------------------------------------------------------");
     }
 
     @Override
@@ -117,10 +118,10 @@ public class VehicleFederate extends AbstractFederate {
     protected void updateAttributeValues(ObjectInstanceHandle objectHandle, int id) throws RTIexception {
         AttributeHandleValueMap attributes = rtiAmbassador.getAttributeHandleValueMapFactory().create(2);
 
-        HLAfloat32BE newPosition = encoderFactory.createHLAfloat32BE( positionList.get(id) );
+        HLAfloat32BE newPosition = encoderFactory.createHLAfloat32BE( vehiclesList.get(id).getVehiclePosition() );
         attributes.put( vehiclePositionHandle, newPosition.toByteArray() );
 
-        HLAinteger32BE availableValue = encoderFactory.createHLAinteger32BE( actualRouteNumberList.get(id) );
+        HLAinteger32BE availableValue = encoderFactory.createHLAinteger32BE( vehiclesList.get(id).getRouteSectionNumber() );
         attributes.put( vehicleRouteNumberHandle, availableValue.toByteArray() );
 
         rtiAmbassador.updateAttributeValues( objectHandle, attributes, generateTag() );
