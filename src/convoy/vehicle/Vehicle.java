@@ -25,27 +25,27 @@ public class Vehicle {
                       float windDirectionX, float windDirectionY, float windForce, boolean isSectionDelayed) {
         float distance = previousVehiclePosition - this.vehiclePosition;
         this.carVelocity = (distance - (distance / expectedDistance) - expectedDistance * 1.01f);
-        this.fuelLevel = (this.fuelLevel - Math.abs(this.carVelocity) * 0.01f);
-        this.vehiclePosition = this.vehiclePosition + this.carVelocity;
         weatherDelay(typeOfWeather);
         routeDelay(typeOfRoute);
         windDelay(windDirectionX, windDirectionY, windForce);
         if (this.carVelocity > this.maxVelocity) this.carVelocity = this.maxVelocity;
         if (this.fuelLevel < 10.0f) fuelReserve = true;
         if (isSectionDelayed) sectionDelay();
+        this.fuelLevel = (this.fuelLevel - Math.abs(this.carVelocity) * 0.01f);
+        this.vehiclePosition = this.vehiclePosition + this.carVelocity;
     }
 
     public void drive(float convoyVelocity, int typeOfWeather, int typeOfRoute, float windDirectionX,
                       float windDirectionY, float windForce, boolean isSectionDelayed) {
         this.carVelocity = 0;
         this.carVelocity = convoyVelocity + this.carVelocity;
-        this.fuelLevel = (this.fuelLevel - this.carVelocity * 0.01f - Math.abs(this.carVelocity) * 0.01f);
-        this.vehiclePosition = this.vehiclePosition + this.carVelocity;
         weatherDelay(typeOfWeather);
         routeDelay(typeOfRoute);
         windDelay(windDirectionX, windDirectionY, windForce);
         if (this.carVelocity > this.maxVelocity) this.carVelocity = this.maxVelocity;
         if (isSectionDelayed) sectionDelay();
+        this.fuelLevel = (this.fuelLevel - this.carVelocity * 0.01f - Math.abs(this.carVelocity) * 0.01f);
+        this.vehiclePosition = this.vehiclePosition + this.carVelocity;
     }
 
     public void sectionDelay() {
@@ -53,11 +53,13 @@ public class Vehicle {
     }
 
     public void weatherDelay(int typeOfWeather) {
-        this.carVelocity = this.carVelocity - this.carVelocity * (1 - (float) Math.pow(typeOfWeather, 2) / 10);
+        if( typeOfWeather != 0 )
+            this.carVelocity = this.carVelocity - this.carVelocity * ((float) Math.pow(typeOfWeather, 2) / 10);
     }
 
     public void routeDelay(int typeOfRoute) {
-        this.carVelocity = this.carVelocity - this.carVelocity * (1 - (float) Math.pow(typeOfRoute, 2) / 10);
+        if( typeOfRoute != 0 )
+            this.carVelocity = this.carVelocity - this.carVelocity * ((float) typeOfRoute / 10);
     }
 
     public void windDelay(float windDirectionX, float windDirectionY, float windForce) {

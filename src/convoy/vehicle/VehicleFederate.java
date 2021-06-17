@@ -81,7 +81,7 @@ public class VehicleFederate extends AbstractFederate {
         for(int i = 0; i < NUMBERS_OF_VEHICLES; i++){
             ObjectInstanceHandle objectHandle = registerObject(vehicleHandle);
             log( "Registered Object, handle=" + objectHandle );
-            float startPosition = (NUMBERS_OF_VEHICLES - i) * EXPECTED_VEHICLES_DISTANCE;
+            float startPosition = (NUMBERS_OF_VEHICLES - i - 1) * EXPECTED_VEHICLES_DISTANCE;
             vehiclesList.add(
                     new Vehicle(i, 0, START_VEHICLES_FUEL, 0F, startPosition, 120F));
             vehicleObjectInstanceHandleList.add(objectHandle);
@@ -134,12 +134,12 @@ public class VehicleFederate extends AbstractFederate {
                 if( id == 0){
                     vehiclesList.get(id).drive(
                             CONVOY_VELOCITY, 0, s.routeSurface,
-                            0, 0, 0, s.routeIsClosed);
+                            0F, 0F, 0F, s.routeIsClosed);
                 }
                 else{
                     vehiclesList.get(id).drive(
                             vehiclesList.get(id - 1).getVehiclePosition(), EXPECTED_VEHICLES_DISTANCE, 0,
-                            s.routeSurface, 0F, 0F, 0, s.routeIsClosed);
+                            s.routeSurface, 0F, 0F, 0F, s.routeIsClosed);
                 }
             }
         }
