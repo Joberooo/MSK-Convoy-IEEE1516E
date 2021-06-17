@@ -12,7 +12,6 @@ public class VehicleFederate extends AbstractFederate {
     public static String FEDERATION_NAME = "ConvoyFederation";
     public static String FEDERATE_NAME = "VehicleFederate";
     public static double TIME_STEP = 1.0;
-    public static final int ITERATIONS = 20;
 
     public static final int NUMBERS_OF_VEHICLES = 3;
     public static final float EXPECTED_VEHICLES_DISTANCE = 20F;
@@ -60,6 +59,7 @@ public class VehicleFederate extends AbstractFederate {
             vehiclesList.add(
                     new Vehicle(i, 0, START_VEHICLES_FUEL, 0F, startPosition, 120F));
             vehicleObjectInstanceHandleList.add(objectHandle);
+            printVehicleData(vehiclesList.get(i));
         }
 
         while(federationAmbassador.isRunning)
@@ -91,11 +91,15 @@ public class VehicleFederate extends AbstractFederate {
         else vehiclesList.get(id).drive(
                 vehiclesList.get(id - 1).getVehiclePosition(), EXPECTED_VEHICLES_DISTANCE, 0,
                 0, 0F, 0F, 0, false);
+        printVehicleData(vehiclesList.get(id));
+    }
+
+    protected void printVehicleData(Vehicle vehicle){
         System.out.println("--------------------------------------------------------------------------------");
-        System.out.println(FEDERATE_NAME + "    ::   Vehicle number = " + vehiclesList.get(id).getVehicleNumber());
-        System.out.println(FEDERATE_NAME + "    ::   Position = " + vehiclesList.get(id).getVehiclePosition());
-        System.out.println(FEDERATE_NAME + "    ::   Route = " + vehiclesList.get(id).getRouteSectionNumber());
-        System.out.println(FEDERATE_NAME + "    ::   FuelLevel = " + vehiclesList.get(id).getFuelLevel());
+        System.out.println(FEDERATE_NAME + "    ::   Vehicle number = " + vehicle.getVehicleNumber());
+        System.out.println(FEDERATE_NAME + "    ::   Position = " + vehicle.getVehiclePosition());
+        System.out.println(FEDERATE_NAME + "    ::   Route = " + vehicle.getRouteSectionNumber());
+        System.out.println(FEDERATE_NAME + "    ::   FuelLevel = " + vehicle.getFuelLevel());
         System.out.println("--------------------------------------------------------------------------------");
     }
 
@@ -114,16 +118,9 @@ public class VehicleFederate extends AbstractFederate {
         rtiAmbassador.publishObjectClassAttributes( vehicleHandle, attributes );
 
         finishSimulationHandle = rtiAmbassador.getInteractionClassHandle( "HLAinteractionRoot.FinishSimulation" );
-        rtiAmbassador.subscribeInteractionClass(finishSimulationHandle);
         rtiAmbassador.publishInteractionClass(finishSimulationHandle);
     }
 
-    @Override
-    protected ObjectInstanceHandle registerObject(ObjectClassHandle objectClassHandle) throws RTIexception {
-        return rtiAmbassador.registerObjectInstance( objectClassHandle );
-    }
-
-    @Override
     protected void updateAttributeValues(ObjectInstanceHandle objectHandle, int id) throws RTIexception {
         AttributeHandleValueMap attributes = rtiAmbassador.getAttributeHandleValueMapFactory().create(2);
 
@@ -142,10 +139,5 @@ public class VehicleFederate extends AbstractFederate {
     protected void sendFinishSimulationInteraction() throws RTIexception{
         ParameterHandleValueMap parameterHandleValueMap = rtiAmbassador.getParameterHandleValueMapFactory().create(1);
         rtiAmbassador.sendInteraction(finishSimulationHandle, parameterHandleValueMap, generateTag());
-    }
-
-    @Override
-    protected void deleteObject(ObjectInstanceHandle handle) throws RTIexception {
-        rtiAmbassador.deleteObjectInstance( handle, generateTag() );
     }
 }

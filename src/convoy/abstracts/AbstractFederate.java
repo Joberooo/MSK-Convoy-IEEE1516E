@@ -142,6 +142,7 @@ public abstract class AbstractFederate {
             URL[] modules = new URL[]{
                     (new File("foms/Vehicle.xml")).toURI().toURL(),
                     (new File("foms/Global.xml")).toURI().toURL(),
+                    (new File("foms/RouteSection.xml")).toURI().toURL(),
             };
 
             rtiAmbassador.createFederationExecution( FEDERATION_NAME, modules );
@@ -163,15 +164,17 @@ public abstract class AbstractFederate {
         log( "Joined " + FEDERATION_NAME + " as " + FEDERATE_NAME );
     } // ZAKUTALIZOWAC PO ZMIANIE FOM!!!
 
+    protected ObjectInstanceHandle registerObject(ObjectClassHandle objectClassHandle) throws RTIexception {
+        return rtiAmbassador.registerObjectInstance( objectClassHandle );
+    }
+
+    protected void deleteObject(ObjectInstanceHandle handle) throws RTIexception {
+        rtiAmbassador.deleteObjectInstance( handle, generateTag() );
+    }
+
     protected abstract void createRTIAmbassador();
 
     protected abstract void mainContent() throws Exception;
 
     protected abstract void publishAndSubscribe() throws RTIexception;
-
-    protected abstract ObjectInstanceHandle registerObject(ObjectClassHandle objectClassHandle) throws RTIexception;
-
-    protected abstract void updateAttributeValues( ObjectInstanceHandle objectHandle, int id ) throws RTIexception;
-
-    protected abstract void deleteObject( ObjectInstanceHandle handle ) throws RTIexception;
 }
