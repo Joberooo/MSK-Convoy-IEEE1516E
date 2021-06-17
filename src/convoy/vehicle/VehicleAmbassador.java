@@ -22,30 +22,7 @@ public class VehicleAmbassador extends AbstractAmbassador {
 
     @Override
     protected String decodeFlavor(byte[] bytes) {
-        HLAinteger32BE value = federate.encoderFactory.createHLAinteger32BE();
-
-        try
-        {
-            value.decode( bytes );
-        }
-        catch( DecoderException de )
-        {
-            return "Decoder Exception: "+de.getMessage();
-        }
-
-        switch( value.getValue() )
-        {
-            case 101:
-                return "Cola";
-            case 102:
-                return "Orange";
-            case 103:
-                return "RootBeer";
-            case 104:
-                return "Cream";
-            default:
-                return "Unknown";
-        }
+        return "";
     }
 
     @Override

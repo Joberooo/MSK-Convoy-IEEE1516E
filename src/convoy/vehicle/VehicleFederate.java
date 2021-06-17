@@ -6,6 +6,7 @@ import hla.rti1516e.encoding.HLAfloat32BE;
 import hla.rti1516e.encoding.HLAinteger32BE;
 import hla.rti1516e.exceptions.RTIexception;
 import hla.rti1516e.time.HLAfloat64Time;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class VehicleFederate extends AbstractFederate {
@@ -18,7 +19,9 @@ public class VehicleFederate extends AbstractFederate {
     protected AttributeHandle vehicleNumberHandle;
     protected AttributeHandle vehiclePositionHandle;
     protected AttributeHandle vehicleRouteNumberHandle;
-    protected float position = 0;
+    protected ArrayList<ObjectInstanceHandle> vehicleList = new ArrayList<>();
+    protected ArrayList<Float> positionList = new ArrayList<>();
+    protected ArrayList<Integer> actualRouteNumberList = new ArrayList<>();
 
     protected VehicleFederate() {
         super(FEDERATE_NAME, FEDERATION_NAME, TIME_STEP);
@@ -47,10 +50,22 @@ public class VehicleFederate extends AbstractFederate {
 
         ObjectInstanceHandle objectHandle = registerObject(vehicleHandle);
         log( "Registered Object, handle=" + objectHandle );
+        positionList.add((float) 0);
+        actualRouteNumberList.add(0);
+        vehicleList.add(objectHandle);
+
+        ObjectInstanceHandle objectHandle2 = registerObject(vehicleHandle);
+        log( "Registered Object, handle=" + objectHandle2 );
+        positionList.add((float) 0);
+        actualRouteNumberList.add(0);
+        vehicleList.add(objectHandle2);
 
         for( int i = 0; i < ITERATIONS; i++ )
         {
-            updateAttributeValues( objectHandle );
+            for(int j = 0; j < vehicleList.size(); j++){
+                modifyCarParameters(j);
+                updateAttributeValues( vehicleList.get(j), j );
+            }
 
             sendInteraction();
 
@@ -58,8 +73,20 @@ public class VehicleFederate extends AbstractFederate {
             log( "Time Advanced to " + federationAmbassador.federateTime );
         }
 
-        deleteObject( objectHandle );
-        log( "Deleted Object, handle=" + objectHandle );
+        for (ObjectInstanceHandle objectInstanceHandle : vehicleList) {
+            deleteObject(objectInstanceHandle);
+            log("Deleted Object, handle=" + objectHandle);
+        }
+    }
+
+    protected void modifyCarParameters(int id){
+        float position = positionList.get(id) + new Random().nextFloat();
+        positionList.set(id, position);
+        System.out.println(FEDERATE_NAME + ": Position = " + position);
+
+        int actualRouteNumber = (int) position / 100;
+        actualRouteNumberList.set(id, actualRouteNumber);
+        System.out.println(FEDERATE_NAME + ": Route = " + actualRouteNumber);
     }
 
     @Override
@@ -83,17 +110,13 @@ public class VehicleFederate extends AbstractFederate {
     }
 
     @Override
-    protected void updateAttributeValues(ObjectInstanceHandle objectHandle) throws RTIexception {
+    protected void updateAttributeValues(ObjectInstanceHandle objectHandle, int id) throws RTIexception {
         AttributeHandleValueMap attributes = rtiAmbassador.getAttributeHandleValueMapFactory().create(2);
 
-        position += new Random().nextFloat();
-        System.out.println(FEDERATE_NAME + ": Position = " + position);
-        HLAfloat32BE newPosition = encoderFactory.createHLAfloat32BE( position );
+        HLAfloat32BE newPosition = encoderFactory.createHLAfloat32BE( positionList.get(id) );
         attributes.put( vehiclePositionHandle, newPosition.toByteArray() );
 
-        int actualRouteNumber = (int) position / 100;
-        System.out.println(FEDERATE_NAME + ": Route = " + actualRouteNumber);
-        HLAinteger32BE availableValue = encoderFactory.createHLAinteger32BE( actualRouteNumber );
+        HLAinteger32BE availableValue = encoderFactory.createHLAinteger32BE( actualRouteNumberList.get(id) );
         attributes.put( vehicleRouteNumberHandle, availableValue.toByteArray() );
 
         rtiAmbassador.updateAttributeValues( objectHandle, attributes, generateTag() );

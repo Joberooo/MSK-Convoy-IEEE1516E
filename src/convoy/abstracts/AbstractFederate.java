@@ -168,7 +168,7 @@ public abstract class AbstractFederate {
 
     protected abstract ObjectInstanceHandle registerObject(ObjectClassHandle objectClassHandle) throws RTIexception;
 
-    protected abstract void updateAttributeValues( ObjectInstanceHandle objectHandle ) throws RTIexception;
+    protected abstract void updateAttributeValues( ObjectInstanceHandle objectHandle, int id ) throws RTIexception;
 
     protected abstract void sendInteraction() throws RTIexception;
 
