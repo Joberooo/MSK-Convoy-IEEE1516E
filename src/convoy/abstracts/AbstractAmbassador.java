@@ -99,10 +99,6 @@ public abstract class AbstractAmbassador extends NullFederateAmbassador {
 
     protected abstract void log(String message);
 
-    protected abstract String decodeFlavor( byte[] bytes );
-
-    protected abstract short decodeNumCups( byte[] bytes );
-
     @Override
     public abstract void reflectAttributeValues( ObjectInstanceHandle theObject, AttributeHandleValueMap theAttributes,
                                         byte[] tag, OrderType sentOrdering, TransportationTypeHandle theTransport,

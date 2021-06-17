@@ -27,6 +27,8 @@ public abstract class AbstractFederate {
     protected HLAfloat64TimeFactory timeFactory;
     public EncoderFactory encoderFactory;
 
+    public InteractionClassHandle finishSimulationHandle;
+
     protected AbstractFederate(String federateName, String federationName,double timeStep) {
         this.FEDERATE_NAME = federateName;
         this.FEDERATION_NAME = federationName;
@@ -139,6 +141,7 @@ public abstract class AbstractFederate {
         {
             URL[] modules = new URL[]{
                     (new File("foms/Vehicle.xml")).toURI().toURL(),
+                    (new File("foms/Global.xml")).toURI().toURL(),
             };
 
             rtiAmbassador.createFederationExecution( FEDERATION_NAME, modules );
@@ -169,8 +172,6 @@ public abstract class AbstractFederate {
     protected abstract ObjectInstanceHandle registerObject(ObjectClassHandle objectClassHandle) throws RTIexception;
 
     protected abstract void updateAttributeValues( ObjectInstanceHandle objectHandle, int id ) throws RTIexception;
-
-    protected abstract void sendInteraction() throws RTIexception;
 
     protected abstract void deleteObject( ObjectInstanceHandle handle ) throws RTIexception;
 }

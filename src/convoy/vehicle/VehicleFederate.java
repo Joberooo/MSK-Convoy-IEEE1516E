@@ -15,15 +15,16 @@ public class VehicleFederate extends AbstractFederate {
     public static final int ITERATIONS = 20;
 
     public static final int NUMBERS_OF_VEHICLES = 3;
-    public static final int EXPECTED_VEHICLES_DISTANCE = 20;
+    public static final float EXPECTED_VEHICLES_DISTANCE = 20F;
     public static final int CONVOY_VELOCITY = 50;
-    public static final int START_VEHICLES_FUEL = 100;
+    public static final float START_VEHICLES_FUEL = 100F;
     public static final float END_OF_ROUTS = 1000.0F;
 
     protected ObjectClassHandle vehicleHandle;
     protected AttributeHandle vehicleNumberHandle;
     protected AttributeHandle vehiclePositionHandle;
     protected AttributeHandle vehicleRouteNumberHandle;
+
     protected ArrayList<Vehicle> vehiclesList = new ArrayList<>();
     protected ArrayList<ObjectInstanceHandle> vehicleObjectInstanceHandleList = new ArrayList<>();
 
@@ -55,9 +56,9 @@ public class VehicleFederate extends AbstractFederate {
         for(int i = 0; i < NUMBERS_OF_VEHICLES; i++){
             ObjectInstanceHandle objectHandle = registerObject(vehicleHandle);
             log( "Registered Object, handle=" + objectHandle );
-            int startPosition = (NUMBERS_OF_VEHICLES - i) * EXPECTED_VEHICLES_DISTANCE;
+            float startPosition = (NUMBERS_OF_VEHICLES - i) * EXPECTED_VEHICLES_DISTANCE;
             vehiclesList.add(
-                    new Vehicle(i, 0, START_VEHICLES_FUEL, 0, startPosition));
+                    new Vehicle(i, 0, START_VEHICLES_FUEL, 0F, startPosition, 120F));
             vehicleObjectInstanceHandleList.add(objectHandle);
         }
 
@@ -69,7 +70,7 @@ public class VehicleFederate extends AbstractFederate {
             }
 
             if(vehiclesList.get(0).getVehiclePosition() > END_OF_ROUTS){
-                sendInteraction();
+                sendFinishSimulationInteraction();
                 federationAmbassador.stopRunning();
             }
 
@@ -84,8 +85,12 @@ public class VehicleFederate extends AbstractFederate {
     }
 
     protected void modifyCarParameters(int id){
-        if( id == 0) vehiclesList.get(id).drive(CONVOY_VELOCITY);
-        else vehiclesList.get(id).drive(vehiclesList.get(id - 1).getVehiclePosition(), EXPECTED_VEHICLES_DISTANCE);
+        if( id == 0) vehiclesList.get(id).drive(
+                CONVOY_VELOCITY, 0, 0,
+                0, 0, 0, false);
+        else vehiclesList.get(id).drive(
+                vehiclesList.get(id - 1).getVehiclePosition(), EXPECTED_VEHICLES_DISTANCE, 0,
+                0, 0F, 0F, 0, false);
         System.out.println("--------------------------------------------------------------------------------");
         System.out.println(FEDERATE_NAME + "    ::   Vehicle number = " + vehiclesList.get(id).getVehicleNumber());
         System.out.println(FEDERATE_NAME + "    ::   Position = " + vehiclesList.get(id).getVehiclePosition());
@@ -107,6 +112,10 @@ public class VehicleFederate extends AbstractFederate {
         attributes.add( vehicleRouteNumberHandle );
 
         rtiAmbassador.publishObjectClassAttributes( vehicleHandle, attributes );
+
+        finishSimulationHandle = rtiAmbassador.getInteractionClassHandle( "HLAinteractionRoot.FinishSimulation" );
+        rtiAmbassador.subscribeInteractionClass(finishSimulationHandle);
+        rtiAmbassador.publishInteractionClass(finishSimulationHandle);
     }
 
     @Override
@@ -130,8 +139,9 @@ public class VehicleFederate extends AbstractFederate {
         rtiAmbassador.updateAttributeValues( objectHandle, attributes, generateTag(), time );
     }
 
-    @Override
-    protected void sendInteraction(){
+    protected void sendFinishSimulationInteraction() throws RTIexception{
+        ParameterHandleValueMap parameterHandleValueMap = rtiAmbassador.getParameterHandleValueMapFactory().create(1);
+        rtiAmbassador.sendInteraction(finishSimulationHandle, parameterHandleValueMap, generateTag());
     }
 
     @Override

@@ -2,10 +2,6 @@ package convoy.vehicle;
 
 import convoy.abstracts.AbstractAmbassador;
 import hla.rti1516e.*;
-import hla.rti1516e.encoding.DecoderException;
-import hla.rti1516e.encoding.HLAinteger16BE;
-import hla.rti1516e.encoding.HLAinteger32BE;
-import hla.rti1516e.time.HLAfloat64Time;
 
 public class VehicleAmbassador extends AbstractAmbassador {
     public static double federateTime        = 0.0;
@@ -18,16 +14,6 @@ public class VehicleAmbassador extends AbstractAmbassador {
     @Override
     protected void log(String message) {
         System.out.println( federate.FEDERATE_NAME + "Ambassador: " + message );
-    }
-
-    @Override
-    protected String decodeFlavor(byte[] bytes) {
-        return "";
-    }
-
-    @Override
-    protected short decodeNumCups(byte[] bytes) {
-        return 0;
     }
 
     @Override
