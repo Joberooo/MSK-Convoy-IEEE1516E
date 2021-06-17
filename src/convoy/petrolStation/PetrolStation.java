@@ -11,8 +11,12 @@ public class PetrolStation {
 
     private boolean fueling = false;
     private float fuelingTime;
+    private final int routeSectionNumber;
+    private final float stationPosition;
 
-    public PetrolStation() {
+    public PetrolStation(int routeSectionNumber, float stationPosition) {
+        this.routeSectionNumber = routeSectionNumber;
+        this.stationPosition = stationPosition;
     }
 
     public boolean isFueling() {
@@ -30,6 +34,14 @@ public class PetrolStation {
 
     public void finishFueling(){
         fueling = false;
+    }
+
+    public int getRouteSectionNumber(){
+        return routeSectionNumber;
+    }
+
+    public float getStationPosition() {
+        return stationPosition;
     }
 
     private float shuffleTime(){
