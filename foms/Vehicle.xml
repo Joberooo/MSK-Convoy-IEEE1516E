@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<objectModel xsi:schemaLocation="http://standards.ieee.org/IEEE1516-2010 http://standards.ieee.org/downloads/1516/1516.2-2010/IEEE1516-DIF-2010.xsd" xmlns="http://standards.ieee.org/IEEE1516-2010" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<objectModel
+        xmlns="http://standards.ieee.org/IEEE1516-2010"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://standards.ieee.org/IEEE1516-2010 http://standards.ieee.org/downloads/1516/1516.2-2010/IEEE1516-DIF-2010.xsd">
+    <modelIdentification>
+        <name>Vehicle</name>
+        <type>FOM</type>
+        <version>1.0</version>
+    </modelIdentification>
     <objects>
         <objectClass>
             <name>HLAobjectRoot</name>
@@ -9,16 +17,62 @@
                 <semantics>One of Convoy Vehicles</semantics>
                 <attribute>
                     <name>VehicleNumber</name>
-                    <dataType>Integer</dataType>
+                    <dataType>HLAinteger32BE</dataType>
                     <updateType>Conditional</updateType>
-                    <updateCondition>Customer request</updateCondition>
-                    <ownership>NoTransfer</ownership>
+                    <updateCondition>On Change</updateCondition>
+                    <ownership>Divest</ownership>
                     <sharing>PublishSubscribe</sharing>
                     <transportation>HLAreliable</transportation>
                     <order>TimeStamp</order>
-                    <semantics>Flavor of soda</semantics>
+                    <semantics>ID of single vehicle</semantics>
+                </attribute>
+                <attribute>
+                    <name>VehiclePosition</name>
+                    <dataType>HLAfloat32BE</dataType>
+                    <updateType>Conditional</updateType>
+                    <updateCondition>On Change</updateCondition>
+                    <ownership>Divest</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>TimeStamp</order>
+                    <semantics>Position of single vehicle</semantics>
+                </attribute>
+                <attribute>
+                    <name>RouteNumber</name>
+                    <dataType>HLAinteger32BE</dataType>
+                    <updateType>Conditional</updateType>
+                    <updateCondition>On Change</updateCondition>
+                    <ownership>Divest</ownership>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>TimeStamp</order>
+                    <semantics>RouteNumber where actually is single vehicle</semantics>
                 </attribute>
             </objectClass>
         </objectClass>
     </objects>
+    <interactions>
+        <interactionClass>
+            <name>HLAinteractionRoot</name>
+            <interactionClass>
+                <name>FuelManagement</name>
+                <sharing>PublishSubscribe</sharing>
+                <transportation>HLAreliable</transportation>
+                <order>Receive</order>
+                <semantics>Management of Fueling</semantics>
+                <parameter>
+                    <name>FuelQuantity</name>
+                    <dataType>HLAdobule32BE</dataType>
+                    <semantics>Amount of fuel, which all vehicles must fueling</semantics>
+                </parameter>
+                <interactionClass>
+                    <name>StartFueling</name>
+                    <sharing>PublishSubscribe</sharing>
+                    <transportation>HLAreliable</transportation>
+                    <order>Receive</order>
+                    <semantics>Iteraction about vehicles fueling</semantics>
+                </interactionClass>
+            </interactionClass>
+        </interactionClass>
+    </interactions>
 </objectModel>

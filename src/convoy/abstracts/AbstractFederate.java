@@ -27,11 +27,6 @@ public abstract class AbstractFederate {
     protected HLAfloat64TimeFactory timeFactory;
     public EncoderFactory encoderFactory;
 
-    public ObjectClassHandle sodaHandle;
-    public AttributeHandle cupsHandle;
-    public AttributeHandle attributeHandle;
-    public InteractionClassHandle servedHandle;
-
     protected AbstractFederate(String federateName, String federationName,double timeStep) {
         this.FEDERATE_NAME = federateName;
         this.FEDERATION_NAME = federationName;
@@ -143,9 +138,7 @@ public abstract class AbstractFederate {
         try
         {
             URL[] modules = new URL[]{
-                    (new File("foms/RestaurantProcesses.xml")).toURI().toURL(),
-                    (new File("foms/RestaurantFood.xml")).toURI().toURL(),
-                    (new File("foms/RestaurantDrinks.xml")).toURI().toURL()
+                    (new File("foms/Vehicle.xml")).toURI().toURL(),
             };
 
             rtiAmbassador.createFederationExecution( FEDERATION_NAME, modules );
@@ -162,11 +155,7 @@ public abstract class AbstractFederate {
             return;
         }
 
-        URL[] joinModules = new URL[]{
-                (new File("foms/RestaurantSoup.xml")).toURI().toURL()
-        };
-
-        rtiAmbassador.joinFederationExecution( FEDERATE_NAME, "ExampleFederateType", FEDERATION_NAME, joinModules );
+        rtiAmbassador.joinFederationExecution( FEDERATE_NAME, "ExampleFederateType", FEDERATION_NAME );
 
         log( "Joined " + FEDERATION_NAME + " as " + FEDERATE_NAME );
     } // ZAKUTALIZOWAC PO ZMIANIE FOM!!!
@@ -177,7 +166,7 @@ public abstract class AbstractFederate {
 
     protected abstract void publishAndSubscribe() throws RTIexception;
 
-    protected abstract ObjectInstanceHandle registerObject() throws RTIexception;
+    protected abstract ObjectInstanceHandle registerObject(ObjectClassHandle objectClassHandle) throws RTIexception;
 
     protected abstract void updateAttributeValues( ObjectInstanceHandle objectHandle ) throws RTIexception;
 
