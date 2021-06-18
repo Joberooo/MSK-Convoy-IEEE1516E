@@ -16,9 +16,10 @@ public class VehicleFederate extends AbstractFederate {
     public static double TIME_STEP = 1.0;
 
     public static final int NUMBERS_OF_VEHICLES = 3;
-    public static final float EXPECTED_VEHICLES_DISTANCE = 20F;
-    public static final int CONVOY_VELOCITY = 50;
-    public static final float START_VEHICLES_FUEL = 100F;
+    public static final float EXPECTED_VEHICLES_DISTANCE = 50f;
+    public static final int CONVOY_VELOCITY = 50000;
+    public static final float START_VEHICLES_FUEL = 100f;
+    public static final float MAX_VELOCITY = 120000f;
     public float END_OF_ROUT;
 
     protected ObjectClassHandle vehicleHandle;
@@ -105,7 +106,7 @@ public class VehicleFederate extends AbstractFederate {
             log( "Registered Object, handle=" + objectHandle );
             float startPosition = (NUMBERS_OF_VEHICLES - i - 1) * EXPECTED_VEHICLES_DISTANCE;
             vehiclesList.add(
-                    new Vehicle(i, 0, START_VEHICLES_FUEL, 0F, startPosition, 120F));
+                    new Vehicle(i, 0, START_VEHICLES_FUEL, 0F, startPosition, MAX_VELOCITY));
             vehicleObjectInstanceHandleList.add(objectHandle);
             printVehicleData(vehiclesList.get(i));
         }
@@ -143,9 +144,9 @@ public class VehicleFederate extends AbstractFederate {
         float completeRout = 0;
         for(SingleRouteSection s : singleRouteSectionList){
             completeRout += s.routeLength;
-            log( "Route nr = " + s.routeNumber + ", Length = " + s.routeLength );
+            log( "Route nr = " + s.routeNumber + ", Length = " + s.routeLength / 1000);
         }
-        log( "CompleteRout = " + completeRout );
+        log( "CompleteRout = " + completeRout / 1000);
         END_OF_ROUT = completeRout;
     }
 
@@ -182,7 +183,7 @@ public class VehicleFederate extends AbstractFederate {
     protected void printVehicleData(Vehicle vehicle){
         System.out.println("--------------------------------------------------------------------------------");
         System.out.println(FEDERATE_NAME + "    ::   Vehicle number = " + vehicle.getVehicleNumber());
-        System.out.println(FEDERATE_NAME + "    ::   Position = " + vehicle.getVehiclePosition());
+        System.out.println(FEDERATE_NAME + "    ::   Position = " + vehicle.getVehiclePosition() / 1000);
         System.out.println(FEDERATE_NAME + "    ::   Route = " + vehicle.getRouteSectionNumber());
         System.out.println(FEDERATE_NAME + "    ::   FuelLevel = " + vehicle.getFuelLevel());
         System.out.println("--------------------------------------------------------------------------------");

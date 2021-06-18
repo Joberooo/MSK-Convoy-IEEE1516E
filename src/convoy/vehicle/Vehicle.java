@@ -1,6 +1,12 @@
 package convoy.vehicle;
 
+import java.util.Random;
+
 public class Vehicle {
+    private static final Random random = new Random();
+    private static final float minFuelConsumption = 0.00015f;
+    private static final float maxFuelConsumption = 0.00025f;
+
     private final int vehicleNumber;
     private int routeSectionNumber;
     private float vehiclePosition;
@@ -32,7 +38,7 @@ public class Vehicle {
             if (this.carVelocity > this.maxVelocity) this.carVelocity = this.maxVelocity;
             if (this.fuelLevel < 10.0f) fuelReserve = true;
             if (isSectionDelayed) sectionDelay();
-            this.fuelLevel = (this.fuelLevel - Math.abs(this.carVelocity) * 0.01f);
+            this.fuelLevel = (this.fuelLevel - Math.abs(this.carVelocity) * randomFuelConsumption());
         }
         else this.carVelocity = 0;
         this.vehiclePosition = this.vehiclePosition + this.carVelocity;
@@ -48,7 +54,7 @@ public class Vehicle {
             windDelay(windDirectionX, windDirectionY, windForce);
             if (this.carVelocity > this.maxVelocity) this.carVelocity = this.maxVelocity;
             if (isSectionDelayed) sectionDelay();
-            this.fuelLevel = (this.fuelLevel - this.carVelocity * 0.01f - Math.abs(this.carVelocity) * 0.01f);
+            this.fuelLevel = (this.fuelLevel - Math.abs(this.carVelocity) * randomFuelConsumption());
         }
         else this.carVelocity = 0;
         this.vehiclePosition = this.vehiclePosition + this.carVelocity;
@@ -59,13 +65,11 @@ public class Vehicle {
     }
 
     public void weatherDelay(int typeOfWeather) {
-        if( typeOfWeather != 0 )
-            this.carVelocity = this.carVelocity - this.carVelocity * ((float) Math.pow(typeOfWeather, 2) / 10);
+        this.carVelocity = this.carVelocity - this.carVelocity * ((float) Math.pow(typeOfWeather, 2) / 10);
     }
 
     public void routeDelay(int typeOfRoute) {
-        if( typeOfRoute != 0 )
-            this.carVelocity = this.carVelocity - this.carVelocity * ((float) typeOfRoute / 10);
+        this.carVelocity = this.carVelocity - this.carVelocity * ((float) typeOfRoute / 10);
     }
 
     public void windDelay(float windDirectionX, float windDirectionY, float windForce) {
@@ -92,6 +96,10 @@ public class Vehicle {
                 }
             }
         }
+    }
+
+    private float randomFuelConsumption(){
+        return minFuelConsumption + random.nextFloat() * (maxFuelConsumption - minFuelConsumption);
     }
 
     public int getVehicleNumber() {

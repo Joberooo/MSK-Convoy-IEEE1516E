@@ -15,7 +15,7 @@ public class RouteSectionFederate extends AbstractFederate {
     public static String FEDERATE_NAME = "RouteSectionFederate";
     public static double TIME_STEP = 5.0;
 
-    public static final int NUMBERS_OF_ROUTE_SECTIONS = 5;
+    public static final int NUMBERS_OF_ROUTE_SECTIONS = 10;
 
     protected ObjectClassHandle routeSectionHandle;
     protected AttributeHandle routeSectionNumberHandle;
