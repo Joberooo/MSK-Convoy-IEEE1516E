@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class RouteSection {
     //Constants
-    private final float MAX_LENGTH = 250;
+    private final float MAX_LENGTH = 80000;
 
     //From FOM
     private final int routeSectionNumber;

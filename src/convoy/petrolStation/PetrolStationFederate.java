@@ -92,7 +92,7 @@ public class PetrolStationFederate extends AbstractFederate {
                     int newNumbers = 0;
                     petrolStationsList.clear();
                     for(SingleRouteSection s : singleRouteSectionList){
-                        for(float i = 10; i < s.routeLength; i += 50){
+                        for(float i = 10000; i < s.routeLength; i += 40000){
                             ObjectInstanceHandle objectHandle = registerObject(petrolStationHandle);
                             log( "Registered Object, handle=" + objectHandle );
                             petrolStationsList.add(new PetrolStation(newNumbers, s.routeNumber,i));
