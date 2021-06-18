@@ -55,23 +55,16 @@
         <interactionClass>
             <name>HLAinteractionRoot</name>
             <interactionClass>
-                <name>FuelManagement</name>
+                <name>StartFueling</name>
                 <sharing>PublishSubscribe</sharing>
                 <transportation>HLAreliable</transportation>
                 <order>Receive</order>
-                <semantics>Management of Fueling</semantics>
+                <semantics>Start Fueling</semantics>
                 <parameter>
                     <name>FuelQuantity</name>
-                    <dataType>HLAdobule32BE</dataType>
+                    <dataType>HLAfloat32BE</dataType>
                     <semantics>Amount of fuel, which all vehicles must fueling</semantics>
                 </parameter>
-                <interactionClass>
-                    <name>StartFueling</name>
-                    <sharing>PublishSubscribe</sharing>
-                    <transportation>HLAreliable</transportation>
-                    <order>Receive</order>
-                    <semantics>Iteraction about vehicles fueling</semantics>
-                </interactionClass>
             </interactionClass>
         </interactionClass>
     </interactions>

@@ -21,6 +21,7 @@ public class VehicleFederate extends AbstractFederate {
     public static final float START_VEHICLES_FUEL = 100f;
     public static final float MAX_VELOCITY = 120f;
     public float END_OF_ROUT;
+    public boolean fueling = false;
 
     protected ObjectClassHandle vehicleHandle;
     protected AttributeHandle vehicleNumberHandle;

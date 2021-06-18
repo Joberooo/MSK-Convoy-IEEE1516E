@@ -6,6 +6,7 @@ public class Vehicle {
     private static final Random random = new Random();
     private static final float minFuelConsumption = 0.15f;
     private static final float maxFuelConsumption = 0.25f;
+    private final float maxFuelLevel;
 
     private final int vehicleNumber;
     private int routeSectionNumber;
@@ -21,6 +22,7 @@ public class Vehicle {
         this.vehicleNumber = vehicleNumber;
         this.routeSectionNumber = routeSectionNumber;
         this.fuelLevel = fuelLevel;
+        this.maxFuelLevel = fuelLevel;
         this.vehiclePosition = vehiclePosition;
         this.maxVelocity = maxVelocity;
         this.fuelReserve = false;
@@ -101,6 +103,7 @@ public class Vehicle {
         windDelay(windDirectionX, windDirectionY, windForce);
         if (this.carVelocity > this.maxVelocity) this.carVelocity = this.maxVelocity;
         if (isSectionDelayed) sectionDelay();
+        if (this.fuelLevel < 10.0f) this.fuelReserve = true;
         this.fuelLevel = (this.fuelLevel - Math.abs(this.carVelocity) * randomFuelConsumption());
     }
     public void delayAndFuel(int typeOfWeather, float windDirectionX, float windDirectionY,
@@ -109,7 +112,14 @@ public class Vehicle {
         windDelay(windDirectionX, windDirectionY, windForce);
         if (this.carVelocity > this.maxVelocity) this.carVelocity = this.maxVelocity;
         if (isSectionDelayed) sectionDelay();
+        if (this.fuelLevel < 10.0f) this.fuelReserve = true;
         this.fuelLevel = (this.fuelLevel - Math.abs(this.carVelocity) * randomFuelConsumption());
+    }
+
+    public void fuelToFull(){
+        this.carVelocity = 0;
+        this.fuelLevel = this.maxFuelLevel;
+        this.fuelReserve = false;
     }
 
     public int getVehicleNumber() {
