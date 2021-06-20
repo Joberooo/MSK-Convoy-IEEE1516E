@@ -9,13 +9,14 @@ import hla.rti1516e.time.HLAfloat64Time;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class VehicleFederate extends AbstractFederate {
     public static String FEDERATION_NAME = "ConvoyFederation";
     public static String FEDERATE_NAME = "VehicleFederate";
     public static double TIME_STEP = 1.0;
 
-    public static final int NUMBERS_OF_VEHICLES = 3;
+    public static final int NUMBERS_OF_VEHICLES =  ThreadLocalRandom.current().nextInt(2, 10);
     public static final float EXPECTED_VEHICLES_DISTANCE = 0.05f;
     public static final float CONVOY_VELOCITY = 60f;
     public static final float START_VEHICLES_FUEL = 100f;
@@ -158,7 +159,6 @@ public class VehicleFederate extends AbstractFederate {
         float completeRout = 0;
         for(SingleRouteSection s : singleRouteSectionList){
             completeRout += s.routeLength;
-            log( "Route nr = " + s.routeNumber + ", Length = " + s.routeLength);
         }
         log( "CompleteRout = " + completeRout);
         END_OF_ROUT = completeRout;
@@ -187,7 +187,6 @@ public class VehicleFederate extends AbstractFederate {
                 if( pos <= s.routeLength ){
                     v.setRouteSectionNumber(s.routeNumber);
                     if(v.getVehicleNumber() == 0) this.positionAtActualRoute = pos;
-                    log( "Position at actual route = " + this.positionAtActualRoute);
                     break;
                 }
                 pos -= s.routeLength;
@@ -208,7 +207,6 @@ public class VehicleFederate extends AbstractFederate {
                     for(SinglePetrolStation s : singlePetrolStationsList){
                         if(s.routeNumber == v.getRouteSectionNumber() && s.petrolPosition > this.positionAtActualRoute){
                             this.distanceToNearestPetrolStation = s.petrolPosition - this.positionAtActualRoute;
-                            log( "Distance to nearest PetrolStation = " + this.distanceToNearestPetrolStation);
                             break;
                         }
                     }
