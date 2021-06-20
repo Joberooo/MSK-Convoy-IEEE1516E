@@ -2,9 +2,9 @@ package convoy.gui;
 
 public class GUI{
 
-    public static void main(String[] args) {
+    MyFrame myFrame;
 
-        new MyFrame();
-
+    public GUI(){
+        this.myFrame = new MyFrame();
     }
 }

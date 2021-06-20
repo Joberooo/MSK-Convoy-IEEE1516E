@@ -9,13 +9,14 @@ import hla.rti1516e.exceptions.RTIexception;
 import hla.rti1516e.time.HLAfloat64Time;
 
 import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class RouteSectionFederate extends AbstractFederate {
     public static String FEDERATION_NAME = "ConvoyFederation";
     public static String FEDERATE_NAME = "RouteSectionFederate";
     public static double TIME_STEP = 5.0;
 
-    public static final int NUMBERS_OF_ROUTE_SECTIONS = 10;
+    public static final int NUMBERS_OF_ROUTE_SECTIONS = ThreadLocalRandom.current().nextInt(3, 10);;
 
     protected ObjectClassHandle routeSectionHandle;
     protected AttributeHandle routeSectionNumberHandle;
