@@ -177,5 +177,80 @@ public class VehicleAmbassador extends AbstractAmbassador {
 
     @Override
     public void receiveInteraction(InteractionClassHandle interactionClass, ParameterHandleValueMap theParameters, byte[] tag, OrderType sentOrdering, TransportationTypeHandle theTransport, LogicalTime time, OrderType receivedOrdering, SupplementalReceiveInfo receiveInfo) {
+        StringBuilder builder = new StringBuilder( "Interaction Received:" );
+        builder.append(" handle=").append(interactionClass);
+
+        if( interactionClass.equals(federate.changeWeatherHandle) ){
+            builder.append( " (Change Weather)" );
+        }
+
+        builder.append(", tag=").append(new String(tag));
+
+        if( time != null ) builder.append(", time=").append(((HLAfloat64Time) time).getValue());
+
+        builder.append(", parameterCount=").append(theParameters.size()).append( "\n" );
+
+        for( ParameterHandle parameter : theParameters.keySet() )
+        {
+            if(parameter.equals(federate.typeHandle))
+            {
+                builder.append( "\tWeather Type param!" );
+                byte[] bytes = theParameters.get(federate.typeHandle);
+                HLAinteger32BE type = new HLA1516eInteger32BE();
+                try {
+                    type.decode(bytes);
+                } catch (DecoderException e) {
+                    e.printStackTrace();
+                }
+                federate.weatherType = type.getValue();
+                builder.append("\tweatherType Value=").append(federate.weatherType);
+            }
+            else if(parameter.equals(federate.powerHandle))
+            {
+                builder.append( "\tWind Power param!" );
+                byte[] bytes = theParameters.get(federate.powerHandle);
+                HLAfloat32BE power = new HLA1516eFloat32BE();
+                try {
+                    power.decode(bytes);
+                } catch (DecoderException e) {
+                    e.printStackTrace();
+                }
+                federate.windPower = power.getValue();
+                builder.append("\twindPower Value=").append(federate.windPower);
+            }
+            else if(parameter.equals(federate.xDirectionHandle))
+            {
+                builder.append( "\tWind X Direction param!" );
+                byte[] bytes = theParameters.get(federate.xDirectionHandle);
+                HLAfloat32BE xDirection = new HLA1516eFloat32BE();
+                try {
+                    xDirection.decode(bytes);
+                } catch (DecoderException e) {
+                    e.printStackTrace();
+                }
+                federate.windDirectionX = xDirection.getValue();
+                builder.append("\twindDirectionX Value=").append(federate.windDirectionX);
+            }
+            else if(parameter.equals(federate.yDirectionHandle))
+            {
+                builder.append( "\tWind Y Direction param!" );
+                byte[] bytes = theParameters.get(federate.yDirectionHandle);
+                HLAfloat32BE yDirection = new HLA1516eFloat32BE();
+                try {
+                    yDirection.decode(bytes);
+                } catch (DecoderException e) {
+                    e.printStackTrace();
+                }
+                federate.windDirectionY = yDirection.getValue();
+                builder.append("\twindDirectionY Value=").append(federate.windDirectionY);
+            }
+            else
+            {
+                builder.append( "\tparamHandle=" ).append( parameter ).append( ", paramValue=" );
+                builder.append( theParameters.get(parameter).length ).append( " bytes" ).append( "\n" );
+            }
+        }
+
+        log( builder.toString() );
     }
 }

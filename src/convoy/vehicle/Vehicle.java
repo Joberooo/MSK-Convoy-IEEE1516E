@@ -103,7 +103,7 @@ public class Vehicle {
         windDelay(windDirectionX, windDirectionY, windForce);
         if (this.carVelocity > this.maxVelocity) this.carVelocity = this.maxVelocity;
         if (isSectionDelayed) sectionDelay();
-        if (this.fuelLevel < 10.0f) this.fuelReserve = true;
+        if (this.fuelLevel < 20.0f) this.fuelReserve = true;
         this.fuelLevel = (this.fuelLevel - Math.abs(this.carVelocity) * randomFuelConsumption());
     }
     public void delayAndFuel(int typeOfWeather, float windDirectionX, float windDirectionY,
@@ -112,7 +112,7 @@ public class Vehicle {
         windDelay(windDirectionX, windDirectionY, windForce);
         if (this.carVelocity > this.maxVelocity) this.carVelocity = this.maxVelocity;
         if (isSectionDelayed) sectionDelay();
-        if (this.fuelLevel < 10.0f) this.fuelReserve = true;
+        if (this.fuelLevel < 20.0f) this.fuelReserve = true;
         this.fuelLevel = (this.fuelLevel - Math.abs(this.carVelocity) * randomFuelConsumption());
     }
 
@@ -120,6 +120,15 @@ public class Vehicle {
         this.carVelocity = 0;
         this.fuelLevel = this.maxFuelLevel;
         this.fuelReserve = false;
+    }
+
+    protected void printVehicleData(String federateName){
+        System.out.println("--------------------------------------------------------------------------------");
+        System.out.println(federateName + "    ::   Vehicle number = " + this.vehicleNumber);
+        System.out.println(federateName + "    ::   Position = " + this.vehiclePosition);
+        System.out.println(federateName + "    ::   Route = " + this.routeSectionNumber);
+        System.out.println(federateName + "    ::   FuelLevel = " + this.fuelLevel);
+        System.out.println("--------------------------------------------------------------------------------");
     }
 
     public int getVehicleNumber() {

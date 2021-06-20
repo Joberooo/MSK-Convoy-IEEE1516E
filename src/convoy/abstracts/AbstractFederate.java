@@ -144,6 +144,8 @@ public abstract class AbstractFederate {
                     (new File("foms/Global.xml")).toURI().toURL(),
                     (new File("foms/RouteSection.xml")).toURI().toURL(),
                     (new File("foms/PetrolStation.xml")).toURI().toURL(),
+                    (new File("foms/Obstacles.xml")).toURI().toURL(),
+                    (new File("foms/Weather.xml")).toURI().toURL(),
             };
 
             rtiAmbassador.createFederationExecution( FEDERATION_NAME, modules );

@@ -17,16 +17,29 @@ public class VehicleFederate extends AbstractFederate {
 
     public static final int NUMBERS_OF_VEHICLES = 3;
     public static final float EXPECTED_VEHICLES_DISTANCE = 0.05f;
-    public static final float CONVOY_VELOCITY = 90f;
+    public static final float CONVOY_VELOCITY = 60f;
     public static final float START_VEHICLES_FUEL = 100f;
     public static final float MAX_VELOCITY = 120f;
     public float END_OF_ROUT;
-    public boolean fueling = false;
+    public boolean needFueling = false;
+    public float distanceToNearestPetrolStation;
+    public float positionAtActualRoute;
 
     protected ObjectClassHandle vehicleHandle;
     protected AttributeHandle vehicleNumberHandle;
     protected AttributeHandle vehiclePositionHandle;
     protected AttributeHandle vehicleRouteNumberHandle;
+
+    protected InteractionClassHandle changeWeatherHandle;
+    protected ParameterHandle typeHandle;
+    protected ParameterHandle powerHandle;
+    protected ParameterHandle xDirectionHandle;
+    protected ParameterHandle yDirectionHandle;
+
+    public int weatherType;
+    public float windPower;
+    public float windDirectionX;
+    public float windDirectionY;
 
     protected ArrayList<Vehicle> vehiclesList = new ArrayList<>();
     protected ArrayList<ObjectInstanceHandle> vehicleObjectInstanceHandleList = new ArrayList<>();
@@ -109,7 +122,7 @@ public class VehicleFederate extends AbstractFederate {
             vehiclesList.add(
                     new Vehicle(i, 0, START_VEHICLES_FUEL, startPosition, MAX_VELOCITY));
             vehicleObjectInstanceHandleList.add(objectHandle);
-            printVehicleData(vehiclesList.get(i));
+            vehiclesList.get(i).printVehicleData(FEDERATE_NAME);
         }
 
         while(federationAmbassador.isRunning)
@@ -145,9 +158,9 @@ public class VehicleFederate extends AbstractFederate {
         float completeRout = 0;
         for(SingleRouteSection s : singleRouteSectionList){
             completeRout += s.routeLength;
-            log( "Route nr = " + s.routeNumber + ", Length = " + s.routeLength / 1000);
+            log( "Route nr = " + s.routeNumber + ", Length = " + s.routeLength);
         }
-        log( "CompleteRout = " + completeRout / 1000);
+        log( "CompleteRout = " + completeRout);
         END_OF_ROUT = completeRout;
     }
 
@@ -157,13 +170,13 @@ public class VehicleFederate extends AbstractFederate {
             if(s.routeNumber == thisRouteNumber){
                 if( id == 0){
                     vehiclesList.get(id).drive(
-                            CONVOY_VELOCITY, 0, s.routeSurface,
-                            0F, 0F, 0F, s.routeIsClosed);
+                            CONVOY_VELOCITY, weatherType, s.routeSurface,
+                            windDirectionX, windDirectionY, windPower, s.routeIsClosed);
                 }
                 else{
                     vehiclesList.get(id).drive(
                             vehiclesList.get(id - 1).getVehiclePosition(), EXPECTED_VEHICLES_DISTANCE,
-                            0, 0F, 0F, 0F, s.routeIsClosed);
+                            weatherType, windDirectionX, windDirectionY, windPower, s.routeIsClosed);
                 }
             }
         }
@@ -173,21 +186,37 @@ public class VehicleFederate extends AbstractFederate {
             for(SingleRouteSection s : singleRouteSectionList){
                 if( pos <= s.routeLength ){
                     v.setRouteSectionNumber(s.routeNumber);
+                    if(v.getVehicleNumber() == 0) this.positionAtActualRoute = pos;
+                    log( "Position at actual route = " + this.positionAtActualRoute);
                     break;
                 }
                 pos -= s.routeLength;
             }
-        }
-        printVehicleData(vehiclesList.get(id));
-    }
 
-    protected void printVehicleData(Vehicle vehicle){
-        System.out.println("--------------------------------------------------------------------------------");
-        System.out.println(FEDERATE_NAME + "    ::   Vehicle number = " + vehicle.getVehicleNumber());
-        System.out.println(FEDERATE_NAME + "    ::   Position = " + vehicle.getVehiclePosition());
-        System.out.println(FEDERATE_NAME + "    ::   Route = " + vehicle.getRouteSectionNumber());
-        System.out.println(FEDERATE_NAME + "    ::   FuelLevel = " + vehicle.getFuelLevel());
-        System.out.println("--------------------------------------------------------------------------------");
+        }
+
+        for(Vehicle v : vehiclesList){
+            if(v.isFuelReserve()){
+                this.needFueling = true;
+                break;
+            }
+        }
+
+        if(this.needFueling){
+            for(Vehicle v : vehiclesList){
+                if(v.getVehicleNumber() == 0){
+                    for(SinglePetrolStation s : singlePetrolStationsList){
+                        if(s.routeNumber == v.getRouteSectionNumber() && s.petrolPosition > this.positionAtActualRoute){
+                            this.distanceToNearestPetrolStation = s.petrolPosition - this.positionAtActualRoute;
+                            log( "Distance to nearest PetrolStation = " + this.distanceToNearestPetrolStation);
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        vehiclesList.get(id).printVehicleData(FEDERATE_NAME);
     }
 
     @Override
@@ -203,6 +232,13 @@ public class VehicleFederate extends AbstractFederate {
         attributes.add( vehicleRouteNumberHandle );
 
         rtiAmbassador.publishObjectClassAttributes( vehicleHandle, attributes );
+
+        changeWeatherHandle = rtiAmbassador.getInteractionClassHandle( "HLAinteractionRoot.ChangeWeather" );
+        typeHandle = rtiAmbassador.getParameterHandle(changeWeatherHandle, "typeOfPrecipitation");
+        powerHandle = rtiAmbassador.getParameterHandle(changeWeatherHandle, "WindPower");
+        xDirectionHandle = rtiAmbassador.getParameterHandle(changeWeatherHandle, "DirectionWindX");
+        yDirectionHandle = rtiAmbassador.getParameterHandle(changeWeatherHandle, "DirectionWindY");
+        rtiAmbassador.subscribeInteractionClass(changeWeatherHandle);
 
         finishSimulationHandle = rtiAmbassador.getInteractionClassHandle( "HLAinteractionRoot.FinishSimulation" );
         rtiAmbassador.publishInteractionClass(finishSimulationHandle);
