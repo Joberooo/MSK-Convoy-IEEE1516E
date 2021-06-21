@@ -90,11 +90,20 @@ public class GuiFederate extends AbstractFederate {
 
         while(federationAmbassador.isRunning)
         {
-            if(singleRouteSectionList.size() == 0 && singleVehiclesList.size() == 0){
-                log( "Waiting for routs and vehicles..." );
+            if(singleRouteSectionList.size() == 0){
+                log( "Waiting for routs..." );
+            }
+            else if(singleVehiclesList.size() == 0){
+                log( "Waiting for vehicles...");
             }
             else{
                 calculateCompleteRout();
+                ArrayList<Float> positionList = new ArrayList<>();
+                for (SingleVehicle v : singleVehiclesList) {
+                    positionList.add(v.vehiclePosition);
+                }
+                float proportion = this.END_OF_ROUT / 800;
+                gui.myFrame.panel.setVehiclesPosition(positionList, proportion);
             }
 
             advanceTime();

@@ -16,9 +16,9 @@ public class VehicleFederate extends AbstractFederate {
     public static String FEDERATE_NAME = "VehicleFederate";
     public static double TIME_STEP = 1.0;
 
-    public static final int NUMBERS_OF_VEHICLES =  ThreadLocalRandom.current().nextInt(2, 10);
-    public static final float EXPECTED_VEHICLES_DISTANCE = 0.05f;
-    public static final float CONVOY_VELOCITY = 60f;
+    public static final int NUMBERS_OF_VEHICLES =  ThreadLocalRandom.current().nextInt(3, 10);
+    public static final float EXPECTED_VEHICLES_DISTANCE = 20f;
+    public static final float CONVOY_VELOCITY = 10f;
     public static final float START_VEHICLES_FUEL = 100f;
     public static final float MAX_VELOCITY = 120f;
     public float END_OF_ROUT;
@@ -139,7 +139,7 @@ public class VehicleFederate extends AbstractFederate {
                     updateAttributeValues( vehicleObjectInstanceHandleList.get(j), j );
                 }
 
-                if(vehiclesList.get(0).getVehiclePosition() > END_OF_ROUT){
+                if(vehiclesList.get(vehiclesList.size() - 1).getVehiclePosition() > END_OF_ROUT){
                     sendFinishSimulationInteraction();
                     federationAmbassador.stopRunning();
                 }
