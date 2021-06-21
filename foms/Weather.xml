@@ -15,7 +15,7 @@
                 <name>ChangeWeather</name>
                 <sharing>PublishSubscribe</sharing>
                 <transportation>HLAreliable</transportation>
-                <order>Receive</order>
+                <order>TimeStamp</order>
                 <semantics>Interaction to change weather</semantics>
                 <parameter>
                     <name>typeOfPrecipitation</name>

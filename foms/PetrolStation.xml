@@ -58,7 +58,7 @@
                 <name>EndOfFueling</name>
                 <sharing>PublishSubscribe</sharing>
                 <transportation>HLAreliable</transportation>
-                <order>Receive</order>
+                <order>TimeStamp</order>
                 <semantics>Finish fueling</semantics>
             </interactionClass>
         </interactionClass>

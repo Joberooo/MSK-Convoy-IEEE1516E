@@ -15,7 +15,7 @@
                 <name>FinishSimulation</name>
                 <sharing>PublishSubscribe</sharing>
                 <transportation>HLAreliable</transportation>
-                <order>Receive</order>
+                <order>TimeStamp</order>
                 <semantics>Finish all simulation</semantics>
             </interactionClass>
         </interactionClass>

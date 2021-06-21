@@ -204,6 +204,7 @@ public class PetrolStationFederate extends AbstractFederate {
 
     protected void sendInteraction() throws RTIexception{
         ParameterHandleValueMap parameterHandleValueMap = rtiAmbassador.getParameterHandleValueMapFactory().create(1);
-        rtiAmbassador.sendInteraction(endOfFuelingHandle, parameterHandleValueMap, generateTag());
+        HLAfloat64Time time = timeFactory.makeTime( federationAmbassador.federateTime+federationAmbassador.federateLookahead );
+        rtiAmbassador.sendInteraction(endOfFuelingHandle, parameterHandleValueMap, generateTag(), time);
     }
 }

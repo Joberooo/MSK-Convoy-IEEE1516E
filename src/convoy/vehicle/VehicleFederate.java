@@ -309,7 +309,8 @@ public class VehicleFederate extends AbstractFederate {
 
     protected void sendFinishSimulationInteraction() throws RTIexception{
         ParameterHandleValueMap parameterHandleValueMap = rtiAmbassador.getParameterHandleValueMapFactory().create(1);
-        rtiAmbassador.sendInteraction(finishSimulationHandle, parameterHandleValueMap, generateTag());
+        HLAfloat64Time time = timeFactory.makeTime( federationAmbassador.federateTime+federationAmbassador.federateLookahead );
+        rtiAmbassador.sendInteraction(finishSimulationHandle, parameterHandleValueMap, generateTag(), time);
     }
 
     protected void sendFuelingInteraction() throws RTIexception{
@@ -324,6 +325,7 @@ public class VehicleFederate extends AbstractFederate {
         HLAfloat32BE fuelQuantity = encoderFactory.createHLAfloat32BE(sum);
 
         parameterHandleValueMap.put(fuelQuantityHandle, fuelQuantity.toByteArray());
-        rtiAmbassador.sendInteraction(startFuelingHandle, parameterHandleValueMap, generateTag());
+        HLAfloat64Time time = timeFactory.makeTime( federationAmbassador.federateTime+federationAmbassador.federateLookahead );
+        rtiAmbassador.sendInteraction(startFuelingHandle, parameterHandleValueMap, generateTag(), time);
     }
 }

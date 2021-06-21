@@ -8,6 +8,7 @@ import hla.rti1516e.ParameterHandleValueMap;
 import hla.rti1516e.encoding.HLAfloat32BE;
 import hla.rti1516e.encoding.HLAinteger32BE;
 import hla.rti1516e.exceptions.RTIexception;
+import hla.rti1516e.time.HLAfloat64Time;
 
 public class WeatherFederate extends AbstractFederate {
     public static String FEDERATION_NAME = "ConvoyFederation";
@@ -80,6 +81,7 @@ public class WeatherFederate extends AbstractFederate {
         parameterHandleValueMap.put(powerHandle, windPower.toByteArray());
         parameterHandleValueMap.put(xDirectionHandle, windDirectionX.toByteArray());
         parameterHandleValueMap.put(yDirectionHandle, windDirectionY.toByteArray());
-        rtiAmbassador.sendInteraction(changeWeatherHandle, parameterHandleValueMap, generateTag());
+        HLAfloat64Time time = timeFactory.makeTime( federationAmbassador.federateTime+federationAmbassador.federateLookahead );
+        rtiAmbassador.sendInteraction(changeWeatherHandle, parameterHandleValueMap, generateTag(), time);
     }
 }

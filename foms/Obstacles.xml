@@ -15,7 +15,7 @@
                 <name>DeleteRouteSection</name>
                 <sharing>PublishSubscribe</sharing>
                 <transportation>HLAreliable</transportation>
-                <order>Receive</order>
+                <order>TimeStamp</order>
                 <semantics>Delete Route Section</semantics>
                 <parameter>
                     <name>NumberOfRouteSection</name>
@@ -27,7 +27,7 @@
                 <name>CloseOrOpenRouteSection</name>
                 <sharing>PublishSubscribe</sharing>
                 <transportation>HLAreliable</transportation>
-                <order>Receive</order>
+                <order>TimeStamp</order>
                 <semantics>Close Route Section</semantics>
                 <parameter>
                     <name>NumberOfRouteSection</name>

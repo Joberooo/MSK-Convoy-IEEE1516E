@@ -58,7 +58,7 @@
                 <name>StartFueling</name>
                 <sharing>PublishSubscribe</sharing>
                 <transportation>HLAreliable</transportation>
-                <order>Receive</order>
+                <order>TimeStamp</order>
                 <semantics>Start Fueling</semantics>
                 <parameter>
                     <name>FuelQuantity</name>

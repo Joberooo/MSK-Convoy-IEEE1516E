@@ -5,6 +5,7 @@ import convoy.config.Config;
 import hla.rti1516e.*;
 import hla.rti1516e.encoding.HLAinteger32BE;
 import hla.rti1516e.exceptions.RTIexception;
+import hla.rti1516e.time.HLAfloat64Time;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -116,7 +117,8 @@ public class TrafficObstaclesFederate extends AbstractFederate {
         ParameterHandle numberOfRouteSectionHandle = rtiAmbassador.getParameterHandle(deleteRouteSectionHandle, "NumberOfRouteSection");
         HLAinteger32BE number = encoderFactory.createHLAinteger32BE(this.currentRouteSectionNumberToDelete);
         parameterHandleValueMap.put(numberOfRouteSectionHandle, number.toByteArray());
-        rtiAmbassador.sendInteraction(deleteRouteSectionHandle, parameterHandleValueMap, generateTag());
+        HLAfloat64Time time = timeFactory.makeTime( federationAmbassador.federateTime+federationAmbassador.federateLookahead );
+        rtiAmbassador.sendInteraction(deleteRouteSectionHandle, parameterHandleValueMap, generateTag(), time);
         log( "Delete Route Section Interaction Sent" );
     }
 
@@ -125,7 +127,8 @@ public class TrafficObstaclesFederate extends AbstractFederate {
         ParameterHandle numberOfRouteSectionHandle = rtiAmbassador.getParameterHandle(closeOrOpenRouteSectionHandle, "NumberOfRouteSection");
         HLAinteger32BE number = encoderFactory.createHLAinteger32BE(this.currentRouteSectionNumberToCloseOrOpen);
         parameterHandleValueMap.put(numberOfRouteSectionHandle, number.toByteArray());
-        rtiAmbassador.sendInteraction(closeOrOpenRouteSectionHandle, parameterHandleValueMap, generateTag());
+        HLAfloat64Time time = timeFactory.makeTime( federationAmbassador.federateTime+federationAmbassador.federateLookahead );
+        rtiAmbassador.sendInteraction(closeOrOpenRouteSectionHandle, parameterHandleValueMap, generateTag(), time);
         log( "Close or Open Route Section Interaction Sent" );
     }
 }
