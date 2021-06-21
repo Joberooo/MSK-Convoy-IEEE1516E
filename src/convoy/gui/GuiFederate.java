@@ -102,7 +102,7 @@ public class GuiFederate extends AbstractFederate {
                 for (SingleVehicle v : singleVehiclesList) {
                     positionList.add(v.vehiclePosition);
                 }
-                float proportion = this.END_OF_ROUT / 800;
+                float proportion = this.END_OF_ROUT / 900;
                 gui.myFrame.panel.setVehiclesPosition(positionList, proportion);
             }
 

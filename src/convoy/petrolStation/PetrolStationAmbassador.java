@@ -122,12 +122,38 @@ public class PetrolStationAmbassador extends AbstractAmbassador {
             builder.append(" (FinishSimulation) ");
             stopRunning();
         }
+        else if( interactionClass.equals(federate.startFuelingHandle) ){
+            builder.append( " (Start fueling)" );
+        }
 
         builder.append(", tag=").append(new String(tag));
 
         if( time != null ) builder.append(", time=").append(((HLAfloat64Time) time).getValue());
 
         builder.append(", parameterCount=").append(theParameters.size()).append( "\n" );
+
+        for( ParameterHandle parameter : theParameters.keySet() )
+        {
+            if(parameter.equals(federate.fuelQuantityHandle))
+            {
+                builder.append( "\tFuel Quantity!" );
+                byte[] bytes = theParameters.get(federate.fuelQuantityHandle);
+                HLAfloat32BE fuelQuantity = new HLA1516eFloat32BE();
+                try {
+                    fuelQuantity.decode(bytes);
+                } catch (DecoderException e) {
+                    e.printStackTrace();
+                }
+                federate.fuelQuantityValue = PetrolStation.startFueling(fuelQuantity.getValue());
+                federate.isFueling = true;
+                builder.append("\tFuel Quantity Value=").append(federate.fuelQuantityValue);
+            }
+            else
+            {
+                builder.append( "\tparamHandle=" ).append( parameter ).append( ", paramValue=" );
+                builder.append( theParameters.get(parameter).length ).append( " bytes" ).append( "\n" );
+            }
+        }
 
         log( builder.toString() );
     }

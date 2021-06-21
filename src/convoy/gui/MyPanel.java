@@ -8,11 +8,11 @@ import javax.swing.*;
 
 public class MyPanel extends JPanel implements ActionListener{
 
-    final int PANEL_WIDTH = 500;
-    final int PANEL_HEIGHT = 800;
+    final int PANEL_WIDTH = 300;
+    final int PANEL_HEIGHT = 900;
     Timer timer;
-    int vehicleH = 5;
-    int vehicleW = 5;
+    int vehicleH = 10;
+    int vehicleW = 10;
     ArrayList<Float> vehiclesPositionList = new ArrayList<>();
     float proportion;
 
@@ -24,8 +24,7 @@ public class MyPanel extends JPanel implements ActionListener{
     }
 
     public void paint(Graphics g) {
-
-        super.paint(g); // paint background
+        super.paint(g);
 
         Graphics2D g2D = (Graphics2D) g;
 

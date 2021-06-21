@@ -183,6 +183,14 @@ public class VehicleAmbassador extends AbstractAmbassador {
         if( interactionClass.equals(federate.changeWeatherHandle) ){
             builder.append( " (Change Weather)" );
         }
+        else if( interactionClass.equals(federate.endOfFuelingHandle) ){
+            builder.append( " (End of fueling)" );
+            federate.isFueling = false;
+            federate.needFueling = false;
+            for(Vehicle v: federate.vehiclesList){
+                v.fuelToFull();
+            }
+        }
 
         builder.append(", tag=").append(new String(tag));
 

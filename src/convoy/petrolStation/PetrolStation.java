@@ -4,10 +4,10 @@ import java.util.Random;
 
 public class PetrolStation {
 
-    private final float FUELING_TIME_RATIO = 10;
-    private final float PETROL_TIME_RATIO = 0.5f;
+    private static final float FUELING_TIME_RATIO = 10;
+    private static final float PETROL_TIME_RATIO = 0.5f;
 
-    private final Random random = new Random();
+    private static final Random random = new Random();
 
     private boolean fueling = false;
     private float fuelingTime;
@@ -25,9 +25,8 @@ public class PetrolStation {
         return fueling;
     }
 
-    public void startFueling(float fuelAmount){
-        fueling = true;
-        fuelingTime = shuffleTime()*FUELING_TIME_RATIO+PETROL_TIME_RATIO*fuelAmount;
+    public static int startFueling(float fuelAmount){
+        return Math.round(fuelAmount / 100) + 1;
     }
 
     public int fuelingTime(){
@@ -48,9 +47,5 @@ public class PetrolStation {
 
     public int getRouteSectionNumber(){
         return routeSectionNumber;
-    }
-
-    private float shuffleTime(){
-        return random.nextFloat();
     }
 }

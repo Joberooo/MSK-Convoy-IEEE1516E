@@ -51,6 +51,28 @@ public class Vehicle {
         this.vehiclePosition = this.vehiclePosition + this.carVelocity;
     }
 
+    public boolean driveToPetrolStation(float convoyVelocity, int typeOfWeather, int typeOfRoute, float windDirectionX,
+                      float windDirectionY, float windForce, boolean isSectionDelayed, float distanceToPetrolStation) {
+        if(fuelLevel > 0){
+            this.carVelocity = 0;
+            this.carVelocity = convoyVelocity + this.carVelocity  - lifeDelay();
+
+            delayAndFuel(typeOfWeather, typeOfRoute, windDirectionX, windDirectionY, windForce, isSectionDelayed);
+            if(distanceToPetrolStation < this.carVelocity){
+                this.carVelocity = distanceToPetrolStation;
+                this.vehiclePosition = this.vehiclePosition + this.carVelocity;
+                return true;
+            }
+            else{
+                this.vehiclePosition = this.vehiclePosition + this.carVelocity;
+                return false;
+            }
+        }
+        else this.carVelocity = 0;
+        this.vehiclePosition = this.vehiclePosition + this.carVelocity;
+        return false;
+    }
+
     public void sectionDelay() {
         this.carVelocity = 0;
     }

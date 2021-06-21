@@ -23,6 +23,7 @@ public class VehicleFederate extends AbstractFederate {
     public static final float MAX_VELOCITY = 120f;
     public float END_OF_ROUT;
     public boolean needFueling = false;
+    public boolean isFueling = false;
     public float distanceToNearestPetrolStation;
     public float positionAtActualRoute;
 
@@ -91,6 +92,9 @@ public class VehicleFederate extends AbstractFederate {
         }
     }
 
+    protected InteractionClassHandle startFuelingHandle;
+    protected InteractionClassHandle endOfFuelingHandle;
+
     protected VehicleFederate() {
         super(FEDERATE_NAME, FEDERATION_NAME, TIME_STEP);
     }
@@ -134,9 +138,11 @@ public class VehicleFederate extends AbstractFederate {
             else{
                 calculateCompleteRout();
 
-                for(int j = 0; j < vehicleObjectInstanceHandleList.size(); j++){
-                    modifyCarParameters(j);
-                    updateAttributeValues( vehicleObjectInstanceHandleList.get(j), j );
+                if(!isFueling){
+                    for(int j = 0; j < vehicleObjectInstanceHandleList.size(); j++){
+                        modifyCarParameters(j);
+                        updateAttributeValues( vehicleObjectInstanceHandleList.get(j), j );
+                    }
                 }
 
                 if(vehiclesList.get(vehiclesList.size() - 1).getVehiclePosition() > END_OF_ROUT){
@@ -164,14 +170,25 @@ public class VehicleFederate extends AbstractFederate {
         END_OF_ROUT = completeRout;
     }
 
-    protected void modifyCarParameters(int id){
+    protected void modifyCarParameters(int id) throws RTIexception {
         int thisRouteNumber = vehiclesList.get(id).getRouteSectionNumber();
         for(SingleRouteSection s : singleRouteSectionList){
             if(s.routeNumber == thisRouteNumber){
                 if( id == 0){
-                    vehiclesList.get(id).drive(
-                            CONVOY_VELOCITY, weatherType, s.routeSurface,
-                            windDirectionX, windDirectionY, windPower, s.routeIsClosed);
+                    if(this.needFueling){
+                        boolean ifInRange = vehiclesList.get(id).driveToPetrolStation(CONVOY_VELOCITY, weatherType,
+                                s.routeSurface, windDirectionX, windDirectionY, windPower, s.routeIsClosed,
+                                this.distanceToNearestPetrolStation);
+                        if(ifInRange){
+                            this.isFueling = true;
+                            sendFuelingInteraction();
+                        }
+                    }
+                    else{
+                        vehiclesList.get(id).drive(
+                                CONVOY_VELOCITY, weatherType, s.routeSurface,
+                                windDirectionX, windDirectionY, windPower, s.routeIsClosed);
+                    }
                 }
                 else{
                     vehiclesList.get(id).drive(
@@ -241,6 +258,9 @@ public class VehicleFederate extends AbstractFederate {
         finishSimulationHandle = rtiAmbassador.getInteractionClassHandle( "HLAinteractionRoot.FinishSimulation" );
         rtiAmbassador.publishInteractionClass(finishSimulationHandle);
 
+        startFuelingHandle = rtiAmbassador.getInteractionClassHandle( "HLAinteractionRoot.StartFueling" );
+        rtiAmbassador.publishInteractionClass(startFuelingHandle);
+
         this.routeSectionHandle = rtiAmbassador.getObjectClassHandle( "HLAobjectRoot.RouteSection" );
         this.routeSectionNumberHandle = rtiAmbassador.getAttributeHandle( routeSectionHandle, "RouteSectionNumber" );
         this.routeSectionLengthHandle = rtiAmbassador.getAttributeHandle( routeSectionHandle, "RouteSectionLength" );
@@ -265,6 +285,9 @@ public class VehicleFederate extends AbstractFederate {
         attributes.add(petrolStationRouteNumberHandle);
 
         rtiAmbassador.subscribeObjectClassAttributes( petrolStationHandle, attributes );
+
+        endOfFuelingHandle = rtiAmbassador.getInteractionClassHandle( "HLAinteractionRoot.EndOfFueling" );
+        rtiAmbassador.subscribeInteractionClass(endOfFuelingHandle);
     }
 
     protected void updateAttributeValues(ObjectInstanceHandle objectHandle, int id) throws RTIexception {
@@ -286,5 +309,20 @@ public class VehicleFederate extends AbstractFederate {
     protected void sendFinishSimulationInteraction() throws RTIexception{
         ParameterHandleValueMap parameterHandleValueMap = rtiAmbassador.getParameterHandleValueMapFactory().create(1);
         rtiAmbassador.sendInteraction(finishSimulationHandle, parameterHandleValueMap, generateTag());
+    }
+
+    protected void sendFuelingInteraction() throws RTIexception{
+        ParameterHandleValueMap parameterHandleValueMap = rtiAmbassador.getParameterHandleValueMapFactory().create(1);
+        ParameterHandle fuelQuantityHandle = rtiAmbassador.getParameterHandle(startFuelingHandle, "FuelQuantity");
+
+        float sum = 0;
+        for(Vehicle v: vehiclesList){
+            sum += v.getMaxVelocity() - v.getFuelLevel();
+        }
+
+        HLAfloat32BE fuelQuantity = encoderFactory.createHLAfloat32BE(sum);
+
+        parameterHandleValueMap.put(fuelQuantityHandle, fuelQuantity.toByteArray());
+        rtiAmbassador.sendInteraction(startFuelingHandle, parameterHandleValueMap, generateTag());
     }
 }

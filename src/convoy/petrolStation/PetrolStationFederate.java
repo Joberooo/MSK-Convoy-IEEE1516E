@@ -49,6 +49,8 @@ public class PetrolStationFederate extends AbstractFederate {
         }
     }
 
+    protected InteractionClassHandle endOfFuelingHandle;
+
     protected PetrolStationFederate() {
         super(FEDERATE_NAME, FEDERATION_NAME, TIME_STEP);
     }
@@ -63,6 +65,11 @@ public class PetrolStationFederate extends AbstractFederate {
             e.printStackTrace();
         }
     }
+
+    protected InteractionClassHandle startFuelingHandle;
+    protected ParameterHandle fuelQuantityHandle;
+    public float fuelQuantityValue;
+    public boolean isFueling;
 
     @Override
     protected void createRTIAmbassador() {
@@ -111,6 +118,17 @@ public class PetrolStationFederate extends AbstractFederate {
                 }
             }
 
+            if(isFueling){
+                if(fuelQuantityValue == 0){
+                    sendInteraction();
+                    isFueling = false;
+                }
+                else{
+                    fuelQuantityValue -= 1;
+                    log( "fuelQuantityValue: " + fuelQuantityValue );
+                }
+            }
+
             advanceTime();
             log( "Time Advanced to " + federationAmbassador.federateTime );
         }
@@ -146,6 +164,13 @@ public class PetrolStationFederate extends AbstractFederate {
         finishSimulationHandle = rtiAmbassador.getInteractionClassHandle( "HLAinteractionRoot.FinishSimulation" );
         rtiAmbassador.subscribeInteractionClass(finishSimulationHandle);
 
+        endOfFuelingHandle = rtiAmbassador.getInteractionClassHandle( "HLAinteractionRoot.EndOfFueling" );
+        rtiAmbassador.publishInteractionClass(endOfFuelingHandle);
+
+        startFuelingHandle = rtiAmbassador.getInteractionClassHandle( "HLAinteractionRoot.StartFueling" );
+        fuelQuantityHandle = rtiAmbassador.getParameterHandle(startFuelingHandle, "FuelQuantity");
+        rtiAmbassador.subscribeInteractionClass(startFuelingHandle);
+
         this.routeSectionHandle = rtiAmbassador.getObjectClassHandle( "HLAobjectRoot.RouteSection" );
         this.routeSectionNumberHandle = rtiAmbassador.getAttributeHandle( routeSectionHandle, "RouteSectionNumber" );
         this.routeSectionLengthHandle = rtiAmbassador.getAttributeHandle( routeSectionHandle, "RouteSectionLength" );
@@ -174,5 +199,10 @@ public class PetrolStationFederate extends AbstractFederate {
 
         HLAfloat64Time time = timeFactory.makeTime( federationAmbassador.federateTime + federationAmbassador.federateLookahead );
         rtiAmbassador.updateAttributeValues( objectHandle, attributes, generateTag(), time );
+    }
+
+    protected void sendInteraction() throws RTIexception{
+        ParameterHandleValueMap parameterHandleValueMap = rtiAmbassador.getParameterHandleValueMapFactory().create(1);
+        rtiAmbassador.sendInteraction(endOfFuelingHandle, parameterHandleValueMap, generateTag());
     }
 }
