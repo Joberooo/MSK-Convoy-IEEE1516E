@@ -1,6 +1,7 @@
 package convoy.weather;
 
 import convoy.abstracts.AbstractFederate;
+import convoy.config.Config;
 import hla.rti1516e.InteractionClassHandle;
 import hla.rti1516e.ParameterHandle;
 import hla.rti1516e.ParameterHandleValueMap;
@@ -11,7 +12,7 @@ import hla.rti1516e.exceptions.RTIexception;
 public class WeatherFederate extends AbstractFederate {
     public static String FEDERATION_NAME = "ConvoyFederation";
     public static String FEDERATE_NAME = "WeatherFederate";
-    public static double TIME_STEP = 5.0;
+    public static double TIME_STEP = Config.WEATHER_TIME_STEP;
 
     private Weather weather;
 

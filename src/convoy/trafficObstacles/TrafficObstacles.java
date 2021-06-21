@@ -1,11 +1,9 @@
 package convoy.trafficObstacles;
 
+import convoy.config.Config;
 import java.util.Random;
 
 public class TrafficObstacles {
-
-    private final float OBSTACLES_FREQUENCY = 0.8f;
-
     private final Random random = new Random();
 
     public TrafficObstacles() {
@@ -13,11 +11,7 @@ public class TrafficObstacles {
 
     private boolean Shuffle(){
         float result = (float)random.nextGaussian();
-
-        if(result > OBSTACLES_FREQUENCY) {
-            return true;
-        }
-        return false;
+        return result > Config.OBSTACLES_FREQUENCY;
     }
 
     public boolean closeSectionPermanently(){
@@ -27,6 +21,4 @@ public class TrafficObstacles {
     public boolean delaySection() {
         return  Shuffle();
     }
-
-
 }

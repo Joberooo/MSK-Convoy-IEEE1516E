@@ -102,6 +102,7 @@ public class PetrolStationAmbassador extends AbstractAmbassador {
                 s.routeLength = single.routeLength;
                 s.routeSurface = single.routeSurface;
                 add = false;
+                this.changeShouldUpdateToTrue();
                 break;
             }
         }

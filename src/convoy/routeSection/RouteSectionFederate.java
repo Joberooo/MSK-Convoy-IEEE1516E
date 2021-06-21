@@ -1,6 +1,7 @@
 package convoy.routeSection;
 
 import convoy.abstracts.AbstractFederate;
+import convoy.config.Config;
 import hla.rti1516e.*;
 import hla.rti1516e.encoding.HLAboolean;
 import hla.rti1516e.encoding.HLAfloat32BE;
@@ -14,9 +15,10 @@ import java.util.concurrent.ThreadLocalRandom;
 public class RouteSectionFederate extends AbstractFederate {
     public static String FEDERATION_NAME = "ConvoyFederation";
     public static String FEDERATE_NAME = "RouteSectionFederate";
-    public static double TIME_STEP = 5.0;
+    public static double TIME_STEP = Config.ROUTE_SECTION_TIME_STEP;
 
-    public static final int NUMBERS_OF_ROUTE_SECTIONS = ThreadLocalRandom.current().nextInt(10, 20);
+    public static final int NUMBERS_OF_ROUTE_SECTIONS =
+            ThreadLocalRandom.current().nextInt(Config.MIN_NUMBER_OF_ROUTE_SECTION, Config.MAX_NUMBER_OF_ROUTE_SECTION);
 
     protected ObjectClassHandle routeSectionHandle;
     protected AttributeHandle routeSectionNumberHandle;
@@ -26,6 +28,14 @@ public class RouteSectionFederate extends AbstractFederate {
 
     protected ArrayList<RouteSection> routeSectionsList = new ArrayList<>();
     protected ArrayList<ObjectInstanceHandle> routeSectionObjectInstanceHandleList = new ArrayList<>();
+
+    protected InteractionClassHandle deleteRouteSectionHandle;
+    protected ParameterHandle numberToDeleteHandle;
+    protected InteractionClassHandle closeOrOpenRouteSectionHandle;
+    protected ParameterHandle numberToChangeHandle;
+
+    public int numberToDelete;
+    public int numberToChange;
 
     protected RouteSectionFederate() {
         super(FEDERATE_NAME, FEDERATION_NAME, TIME_STEP);
@@ -66,7 +76,7 @@ public class RouteSectionFederate extends AbstractFederate {
                 for(int j = 0; j < routeSectionObjectInstanceHandleList.size(); j++){
                     updateAttributeValues( routeSectionObjectInstanceHandleList.get(j), j );
                 }
-                federationAmbassador.changeShouldUpdate();
+                federationAmbassador.changeShouldUpdateToFalse();
             }
 
             advanceTime();
@@ -76,6 +86,38 @@ public class RouteSectionFederate extends AbstractFederate {
         for (ObjectInstanceHandle objectInstanceHandle : routeSectionObjectInstanceHandleList) {
             deleteObject(objectInstanceHandle);
             log("Deleted Object, handle=" + objectInstanceHandle);
+        }
+    }
+
+    protected void deleteRouteSectionByNumber(int id){
+        int numberOfNewRoutSections = ThreadLocalRandom.current().nextInt(Config.MIN_SECTION, Config.MAX_SECTION);
+        ArrayList<RouteSection> newRoutSections = new ArrayList<>();
+        int newSize = routeSectionsList.size() + numberOfNewRoutSections;
+        for(int i = 0; i < newSize; i++){
+            if(i < id){
+                newRoutSections.add(routeSectionsList.get(i));
+            }
+            if(i >= id || i < id + numberOfNewRoutSections){
+                newRoutSections.add(new RouteSection(i));
+            }
+            else{
+                newRoutSections.add(routeSectionsList.get(i + numberOfNewRoutSections - 1));
+            }
+        }
+        routeSectionsList = newRoutSections;
+        for(int i = 0; i < routeSectionsList.size(); i++){
+            routeSectionsList.get(i).setRouteSectionNumber(i);
+        }
+        federationAmbassador.changeShouldUpdateToTrue();
+    }
+
+    protected void closeOrOpenRouteSectionByNumber(int id){
+        for(RouteSection r: routeSectionsList){
+            if(r.getRouteSectionNumber() == id){
+                r.changeIsClosed();
+                federationAmbassador.changeShouldUpdateToTrue();
+                break;
+            }
         }
     }
 
@@ -107,6 +149,14 @@ public class RouteSectionFederate extends AbstractFederate {
 
         finishSimulationHandle = rtiAmbassador.getInteractionClassHandle( "HLAinteractionRoot.FinishSimulation" );
         rtiAmbassador.subscribeInteractionClass(finishSimulationHandle);
+
+        deleteRouteSectionHandle = rtiAmbassador.getInteractionClassHandle( "HLAinteractionRoot.DeleteRouteSection" );
+        numberToDeleteHandle = rtiAmbassador.getParameterHandle(deleteRouteSectionHandle, "NumberOfRouteSection");
+        rtiAmbassador.subscribeInteractionClass(deleteRouteSectionHandle);
+
+        closeOrOpenRouteSectionHandle = rtiAmbassador.getInteractionClassHandle( "HLAinteractionRoot.CloseOrOpenRouteSection" );
+        numberToChangeHandle = rtiAmbassador.getParameterHandle(closeOrOpenRouteSectionHandle, "NumberOfRouteSection");
+        rtiAmbassador.subscribeInteractionClass(closeOrOpenRouteSectionHandle);
     }
 
     protected void updateAttributeValues(ObjectInstanceHandle objectHandle, int id) throws RTIexception {

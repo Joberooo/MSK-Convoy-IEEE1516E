@@ -1,6 +1,7 @@
 package convoy.vehicle;
 
 import convoy.abstracts.AbstractFederate;
+import convoy.config.Config;
 import hla.rti1516e.*;
 import hla.rti1516e.encoding.HLAfloat32BE;
 import hla.rti1516e.encoding.HLAinteger32BE;
@@ -14,13 +15,13 @@ import java.util.concurrent.ThreadLocalRandom;
 public class VehicleFederate extends AbstractFederate {
     public static String FEDERATION_NAME = "ConvoyFederation";
     public static String FEDERATE_NAME = "VehicleFederate";
-    public static double TIME_STEP = 1.0;
+    public static double TIME_STEP = Config.VEHICLE_TIME_STEP;
 
     public static final int NUMBERS_OF_VEHICLES =  ThreadLocalRandom.current().nextInt(3, 10);
-    public static final float EXPECTED_VEHICLES_DISTANCE = 20f;
-    public static final float CONVOY_VELOCITY = 10f;
-    public static final float START_VEHICLES_FUEL = 100f;
-    public static final float MAX_VELOCITY = 120f;
+    public static final float EXPECTED_VEHICLES_DISTANCE = Config.EXPECTED_VEHICLES_DISTANCE;
+    public static final float CONVOY_VELOCITY = Config.CONVOY_VELOCITY;
+    public static final float START_VEHICLES_FUEL = Config.START_VEHICLES_FUEL;
+    public static final float MAX_VELOCITY = Config.MAX_VELOCITY;
     public float END_OF_ROUT;
     public boolean needFueling = false;
     public boolean isFueling = false;

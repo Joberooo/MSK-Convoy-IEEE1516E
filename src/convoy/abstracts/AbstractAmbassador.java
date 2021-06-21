@@ -29,8 +29,12 @@ public abstract class AbstractAmbassador extends NullFederateAmbassador {
         this.isRunning = false;
     }
 
-    public void changeShouldUpdate(){
-        this.shouldUpdate = !this.shouldUpdate;
+    public void changeShouldUpdateToTrue(){
+        this.shouldUpdate = true;
+    }
+
+    public void changeShouldUpdateToFalse(){
+        this.shouldUpdate = false;
     }
 
     @Override

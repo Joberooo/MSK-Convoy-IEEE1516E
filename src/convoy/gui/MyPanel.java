@@ -1,5 +1,7 @@
 package convoy.gui;
 
+import convoy.config.Config;
+
 import java.awt.*;
 
 import java.awt.event.*;
@@ -8,8 +10,8 @@ import javax.swing.*;
 
 public class MyPanel extends JPanel implements ActionListener{
 
-    final int PANEL_WIDTH = 300;
-    final int PANEL_HEIGHT = 900;
+    final int PANEL_WIDTH = Config.PANEL_WIDTH;
+    final int PANEL_HEIGHT = Config.PANEL_HEIGHT;
     Timer timer;
     int vehicleH = 10;
     int vehicleW = 10;

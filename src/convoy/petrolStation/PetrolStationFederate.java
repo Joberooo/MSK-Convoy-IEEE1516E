@@ -1,6 +1,7 @@
 package convoy.petrolStation;
 
 import convoy.abstracts.AbstractFederate;
+import convoy.config.Config;
 import hla.rti1516e.*;
 import hla.rti1516e.encoding.HLAfloat32BE;
 import hla.rti1516e.encoding.HLAinteger32BE;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 public class PetrolStationFederate extends AbstractFederate {
     public static String FEDERATION_NAME = "ConvoyFederation";
     public static String FEDERATE_NAME = "PetrolStationFederate";
-    public static double TIME_STEP = 1.0;
+    public static double TIME_STEP = Config.PETROL_STATION_STEP;
 
     private boolean isCreated = false;
 
@@ -92,7 +93,7 @@ public class PetrolStationFederate extends AbstractFederate {
                         for(int j = 0; j < petrolStationsObjectInstanceHandleList.size(); j++){
                             updateAttributeValues( petrolStationsObjectInstanceHandleList.get(j), j );
                         }
-                        federationAmbassador.changeShouldUpdate();
+                        federationAmbassador.changeShouldUpdateToFalse();
                     }
                 }
                 else{
@@ -114,7 +115,7 @@ public class PetrolStationFederate extends AbstractFederate {
                         updateAttributeValues( petrolStationsObjectInstanceHandleList.get(j), j );
                     }
                     isCreated = true;
-                    federationAmbassador.changeShouldUpdate();
+                    federationAmbassador.changeShouldUpdateToFalse();
                 }
             }
 

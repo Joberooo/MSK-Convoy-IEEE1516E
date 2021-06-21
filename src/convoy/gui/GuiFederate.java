@@ -1,6 +1,7 @@
 package convoy.gui;
 
 import convoy.abstracts.AbstractFederate;
+import convoy.config.Config;
 import hla.rti1516e.AttributeHandle;
 import hla.rti1516e.AttributeHandleSet;
 import hla.rti1516e.ObjectClassHandle;
@@ -10,9 +11,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 public class GuiFederate extends AbstractFederate {
-    public static String FEDERATION_NAME = "ConvoyFederation";
+    public static String FEDERATION_NAME = Config.FEDERATION_NAME;
     public static String FEDERATE_NAME = "GuiFederate";
-    public static double TIME_STEP = 1.0;
+    public static double TIME_STEP = Config.GUI_TIME_STEP;
     public float END_OF_ROUT;
 
     protected ObjectClassHandle vehicleHandle;
@@ -102,7 +103,7 @@ public class GuiFederate extends AbstractFederate {
                 for (SingleVehicle v : singleVehiclesList) {
                     positionList.add(v.vehiclePosition);
                 }
-                float proportion = this.END_OF_ROUT / 900;
+                float proportion = this.END_OF_ROUT / Config.PANEL_HEIGHT;
                 gui.myFrame.panel.setVehiclesPosition(positionList, proportion);
             }
 

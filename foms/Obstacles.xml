@@ -24,23 +24,11 @@
                 </parameter>
             </interactionClass>
             <interactionClass>
-                <name>CloseRouteSection</name>
+                <name>CloseOrOpenRouteSection</name>
                 <sharing>PublishSubscribe</sharing>
                 <transportation>HLAreliable</transportation>
                 <order>Receive</order>
                 <semantics>Close Route Section</semantics>
-                <parameter>
-                    <name>NumberOfRouteSection</name>
-                    <dataType>HLAinteger32BE</dataType>
-                    <semantics>Number Of Route Section</semantics>
-                </parameter>
-            </interactionClass>
-            <interactionClass>
-                <name>OpenRouteSection</name>
-                <sharing>PublishSubscribe</sharing>
-                <transportation>HLAreliable</transportation>
-                <order>Receive</order>
-                <semantics>Open Route Section</semantics>
                 <parameter>
                     <name>NumberOfRouteSection</name>
                     <dataType>HLAinteger32BE</dataType>

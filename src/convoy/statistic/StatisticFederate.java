@@ -1,6 +1,7 @@
 package convoy.statistic;
 
 import convoy.abstracts.AbstractFederate;
+import convoy.config.Config;
 import hla.rti1516e.AttributeHandle;
 import hla.rti1516e.AttributeHandleSet;
 import hla.rti1516e.ObjectClassHandle;
@@ -12,12 +13,13 @@ import org.knowm.xchart.XYChartBuilder;
 import org.knowm.xchart.style.Styler;
 import org.knowm.xchart.style.markers.SeriesMarkers;
 
+import javax.swing.*;
 import java.util.ArrayList;
 
 public class StatisticFederate extends AbstractFederate {
     public static String FEDERATION_NAME = "ConvoyFederation";
     public static String FEDERATE_NAME = "StatisticFederate";
-    public static double TIME_STEP = 1.0;
+    public static double TIME_STEP = Config.STATISTIC_TIME_STEP;
     public float END_OF_ROUT;
 
     protected ObjectClassHandle vehicleHandle;
@@ -157,7 +159,6 @@ public class StatisticFederate extends AbstractFederate {
         }
 
         new SwingWrapper(chart).displayChart();
-
     }
 
     private void calculateCompleteRout(){

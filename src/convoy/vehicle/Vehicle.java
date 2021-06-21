@@ -1,11 +1,13 @@
 package convoy.vehicle;
 
+import convoy.config.Config;
+
 import java.util.Random;
 
 public class Vehicle {
     private static final Random random = new Random();
-    private static final float minFuelConsumption = 0.15f;
-    private static final float maxFuelConsumption = 0.25f;
+    private static final float minFuelConsumption = Config.MIN_FUEL_CONSUMPTION;
+    private static final float maxFuelConsumption = Config.MAX_FUEL_CONSUMPTION;
     private final float maxFuelLevel;
 
     private final int vehicleNumber;
@@ -167,10 +169,6 @@ public class Vehicle {
 
     public float getVehiclePosition() {
         return vehiclePosition;
-    }
-
-    public float getCarVelocity() {
-        return carVelocity;
     }
 
     public float getFuelLevel() {
